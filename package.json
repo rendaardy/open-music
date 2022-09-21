@@ -5,6 +5,7 @@
 	"main": "src/index.js",
 	"type": "module",
 	"scripts": {
+		"prepare": "husky install",
 		"fmt": "prettier --cache --write .",
 		"lint": "eslint --cache --ext js,cjs,mjs,ts,cts,mts .",
 		"check": "tsc",
@@ -12,6 +13,10 @@
 		"start:dev": "tsx watch --clear-screen=false src/index.js | pino-pretty",
 		"migrate": "node-pg-migrate",
 		"test": "vitest --threads=false"
+	},
+	"lint-staged": {
+		"*.{js,cjs,mjs,ts,cts,mts,json}": "pnpm fmt",
+		"*.{js,cjs,mjs,ts,cts,mts}": "pnpm lint"
 	},
 	"keywords": [],
 	"author": "Marenda S.A. <renda_ardy@tutanota.com>",

@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 
 import pg from "pg";
 
-import "core-js/actual/array/group-to-map";
+import "core-js/actual/array/group-to-map.js";
 
 const { Pool } = pg;
 

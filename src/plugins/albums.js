@@ -1,6 +1,6 @@
-import Boom from "@hapi/boom";
 import Joi from "joi";
 
+import { InvariantError } from "../utils/error/invariant-error.js";
 import {
 	getAlbumHandler,
 	postAlbumHandler,
@@ -62,6 +62,9 @@ export const albumsPlugin = {
 						params: Joi.object({
 							id: Joi.string(),
 						}),
+						async failAction(request, h, err) {
+							throw new InvariantError(/** @type {any} */ (err)?.details[0].message);
+						},
 					},
 					response: {
 						schema: getAlbumResponseSchema,
@@ -76,11 +79,7 @@ export const albumsPlugin = {
 					validate: {
 						payload: bodySchema,
 						async failAction(request, h, err) {
-							const error = Boom.badRequest(/** @type {any} */ (err)?.details[0].message);
-							error.reformat();
-							error.output.payload.status = "fail";
-
-							throw error;
+							throw new InvariantError(/** @type {any} */ (err)?.details[0].message);
 						},
 					},
 					response: {
@@ -99,11 +98,7 @@ export const albumsPlugin = {
 						}),
 						payload: bodySchema,
 						async failAction(request, h, err) {
-							const error = Boom.badRequest(/** @type {any} */ (err)?.details[0].message);
-							error.reformat();
-							error.output.payload.status = "fail";
-
-							throw error;
+							throw new InvariantError(/** @type {any} */ (err)?.details[0].message);
 						},
 					},
 					response: {
@@ -120,6 +115,9 @@ export const albumsPlugin = {
 						params: Joi.object({
 							id: Joi.string(),
 						}),
+						async failAction(request, h, err) {
+							throw new InvariantError(/** @type {any} */ (err)?.details[0].message);
+						},
 					},
 					response: {
 						schema: responseSchema,

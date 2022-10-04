@@ -1,38 +1,20 @@
-import Boom from "@hapi/boom";
-
 /**
  * @param {import("@hapi/hapi").Request} request
- * @param {import("@hapi/hapi").ResponseToolkit} h
+ * @param {import("@hapi/hapi").ResponseToolkit} _h
  * @return {Promise<import("@hapi/hapi").Lifecycle.ReturnValue>}
  */
-export async function getAlbumHandler(request, h) {
+export async function getAlbumHandler(request, _h) {
 	const { id } = request.params;
+	const { getAlbum } = request.server.methods;
+	const album = await getAlbum(id);
 
-	try {
-		const album = await request.server.methods.getAlbum(id);
-
-		if (!album) {
-			const boom = Boom.notFound("Album not found");
-			boom.reformat();
-			boom.output.payload.status = "fail";
-			return boom;
-		}
-
-		return h
-			.response({
-				status: "success",
-				message: "Album retrieved successfully",
-				data: {
-					album,
-				},
-			})
-			.code(200);
-	} catch (error) {
-		const boom = Boom.badImplementation(error.message);
-		boom.reformat();
-		boom.output.payload.status = "fail";
-		return boom;
-	}
+	return {
+		status: "success",
+		message: "Album retrieved successfully",
+		data: {
+			album,
+		},
+	};
 }
 
 /**
@@ -42,88 +24,51 @@ export async function getAlbumHandler(request, h) {
  */
 export async function postAlbumHandler(request, h) {
 	const { payload } = request;
+	const { addAlbum } = request.server.methods;
+	const albumId = await addAlbum(payload);
 
-	try {
-		const albumId = await request.server.methods.addAlbum(payload);
-
-		return h
-			.response({
-				status: "success",
-				message: "Album added successfully",
-				data: {
-					albumId,
-				},
-			})
-			.code(201);
-	} catch (error) {
-		const boom = Boom.badImplementation(error.message);
-		boom.reformat();
-		boom.output.payload.status = "fail";
-		return boom;
-	}
+	return h
+		.response({
+			status: "success",
+			message: "Album added successfully",
+			data: {
+				albumId,
+			},
+		})
+		.code(201);
 }
 
 /**
  * @param {import("@hapi/hapi").Request} request
- * @param {import("@hapi/hapi").ResponseToolkit} h
+ * @param {import("@hapi/hapi").ResponseToolkit} _h
  * @return {Promise<import("@hapi/hapi").Lifecycle.ReturnValue>}
  */
-export async function putAlbumHandler(request, h) {
+export async function putAlbumHandler(request, _h) {
 	const { id } = request.params;
 	const { payload } = request;
+	const { updateAlbum } = request.server.methods;
 
-	try {
-		const rowCount = await request.server.methods.updateAlbum(id, payload);
+	await updateAlbum(id, payload);
 
-		if (rowCount <= 0) {
-			const boom = Boom.notFound("Album not found");
-			boom.reformat();
-			boom.output.payload.status = "fail";
-			return boom;
-		}
-
-		return h
-			.response({
-				status: "success",
-				message: "Album updated successfully",
-			})
-			.code(200);
-	} catch (error) {
-		const boom = Boom.badImplementation(error.message);
-		boom.reformat();
-		boom.output.payload.status = "fail";
-		return boom;
-	}
+	return {
+		status: "success",
+		message: "Album updated successfully",
+	};
 }
 
 /**
  * @param {import("@hapi/hapi").Request} request
- * @param {import("@hapi/hapi").ResponseToolkit} h
+ * @param {import("@hapi/hapi").ResponseToolkit} _h
  * @return {Promise<import("@hapi/hapi").Lifecycle.ReturnValue>}
  */
-export async function deleteAlbumHandler(request, h) {
+export async function deleteAlbumHandler(request, _h) {
 	const { id } = request.params;
+	const { deleteAlbum } = request.server.methods;
 
-	try {
-		const rowCount = await request.server.methods.deleteAlbum(id);
+	await deleteAlbum(id);
 
-		if (rowCount <= 0) {
-			const boom = Boom.notFound("Album not found");
-			boom.reformat();
-			boom.output.payload.status = "fail";
-			return boom;
-		}
-
-		return h
-			.response({
-				status: "success",
-				message: "Album deleted successfully",
-			})
-			.code(200);
-	} catch (error) {
-		const boom = Boom.badImplementation(error.message);
-		boom.reformat();
-		boom.output.payload.status = "fail";
-		return boom;
-	}
+	return {
+		status: "success",
+		message: "Album deleted successfully",
+	};
 }

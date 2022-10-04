@@ -1,7 +1,6 @@
 lockfileVersion: 5.4
 
 specifiers:
-  '@hapi/boom': ^10.0.0
   '@hapi/hapi': ^20.2.2
   '@types/core-js': ^2.5.5
   '@types/hapi__hapi': ^20.0.12
@@ -28,7 +27,6 @@ specifiers:
   vitest: ^0.23.4
 
 dependencies:
-  '@hapi/boom': 10.0.0
   '@hapi/hapi': 20.2.2
   core-js: 3.25.2
   dotenv: 16.0.2
@@ -122,12 +120,6 @@ packages:
     resolution: {integrity: sha512-ngu0tSEmrezoiIaNGG6rRvKOUkUuDdf4XTPnONHGYfSGRmDqPZX5oJL6HAdKTo1UQHECbdB4OzhWrfgVppjHUw==}
     dependencies:
       '@hapi/hoek': 9.3.0
-
-  /@hapi/boom/10.0.0:
-    resolution: {integrity: sha512-1YVs9tLHhypBqqinKQRqh7FUERIolarQApO37OWkzD+z6y6USi871Sv746zBPKcIOBuI6g6y4FrwX87mmJ90Gg==}
-    dependencies:
-      '@hapi/hoek': 10.0.1
-    dev: false
 
   /@hapi/boom/9.1.4:
     resolution: {integrity: sha512-Ls1oH8jaN1vNsqcaHVYJrKmgMcKsC1wcp8bujvXrHaAqD2iDYq3HoOwsxwo09Cuda5R5nC0o0IxlrlTuvPuzSw==}

@@ -1,68 +1,42 @@
-import Boom from "@hapi/boom";
-
 /**
  * @param {import("@hapi/hapi").Request} request
- * @param {import("@hapi/hapi").ResponseToolkit} h
+ * @param {import("@hapi/hapi").ResponseToolkit} _h
  * @return {Promise<import("@hapi/hapi").Lifecycle.ReturnValue>}
  */
-export async function getAllSongsHandler(request, h) {
-	try {
-		const songs = await request.server.methods.getSongs(request.query);
+export async function getAllSongsHandler(request, _h) {
+	const { getSongs } = request.server.methods;
+	const songs = await getSongs(request.query);
 
-		return h
-			.response({
-				status: "success",
-				message: "All songs retrieved successfully",
-				data: {
-					songs: songs.map((song) => ({
-						id: song.id,
-						title: song.title,
-						performer: song.performer,
-					})),
-				},
-			})
-			.code(200);
-	} catch (error) {
-		const boom = Boom.badImplementation(error.message);
-		boom.reformat();
-		boom.output.payload.status = "fail";
-		return boom;
-	}
+	return {
+		status: "success",
+		message: "All songs retrieved successfully",
+		data: {
+			songs: songs.map((song) => ({
+				id: song.id,
+				title: song.title,
+				performer: song.performer,
+			})),
+		},
+	};
 }
 
 /**
  * @param {import("@hapi/hapi").Request} request
- * @param {import("@hapi/hapi").ResponseToolkit} h
+ * @param {import("@hapi/hapi").ResponseToolkit} _h
  * @return {Promise<import("@hapi/hapi").Lifecycle.ReturnValue>}
  */
-export async function getSongHandler(request, h) {
+export async function getSongHandler(request, _h) {
 	const { id } = request.params;
+	const { getSong } = request.server.methods;
+	const song = await getSong(id);
 
-	try {
-		const song = await request.server.methods.getSong(id);
-
-		if (!song) {
-			const boom = Boom.notFound("Song not found");
-			boom.reformat();
-			boom.output.payload.status = "fail";
-			return boom;
-		}
-
-		return h
-			.response({
-				status: "success",
-				message: "Song retrieved successfully",
-				data: {
-					song,
-				},
-			})
-			.code(200);
-	} catch (error) {
-		const boom = Boom.badImplementation(error.message);
-		boom.reformat();
-		boom.output.payload.status = "fail";
-		return boom;
-	}
+	return {
+		status: "success",
+		message: "Song retrieved successfully",
+		data: {
+			song,
+		},
+	};
 }
 
 /**
@@ -72,99 +46,51 @@ export async function getSongHandler(request, h) {
  */
 export async function postSongHandler(request, h) {
 	const { payload } = request;
+	const { addSong } = request.server.methods;
+	const songId = await addSong(payload);
 
-	try {
-		const songId = await request.server.methods.addSong(payload);
-
-		return h
-			.response({
-				status: "success",
-				message: "Song added successfully",
-				data: {
-					songId,
-				},
-			})
-			.code(201);
-	} catch (error) {
-		const boom = Boom.badImplementation(error.message);
-		boom.reformat();
-		boom.output.payload.status = "fail";
-		return boom;
-	}
+	return h
+		.response({
+			status: "success",
+			message: "Song added successfully",
+			data: {
+				songId,
+			},
+		})
+		.code(201);
 }
 
 /**
  * @param {import("@hapi/hapi").Request} request
- * @param {import("@hapi/hapi").ResponseToolkit} h
+ * @param {import("@hapi/hapi").ResponseToolkit} _h
  * @return {Promise<import("@hapi/hapi").Lifecycle.ReturnValue>}
  */
-export async function putSongHandler(request, h) {
+export async function putSongHandler(request, _h) {
 	const { id } = request.params;
 	const { payload } = request;
+	const { updateSong } = request.server.methods;
 
-	try {
-		const rowCount = await request.server.methods.updateSong(id, payload);
+	await updateSong(id, payload);
 
-		if (rowCount <= 0) {
-			const boom = Boom.notFound("Song not found");
-			boom.reformat();
-			boom.output.payload.status = "fail";
-			return boom;
-		}
-
-		return h
-			.response({
-				status: "success",
-				message: "Song updated successfully",
-			})
-			.code(200);
-	} catch (error) {
-		const boom = Boom.badImplementation(error.message);
-		boom.reformat();
-		boom.output.payload.status = "fail";
-		return boom;
-	}
+	return {
+		status: "success",
+		message: "Song updated successfully",
+	};
 }
 
 /**
  * @param {import("@hapi/hapi").Request} request
- * @param {import("@hapi/hapi").ResponseToolkit} h
+ * @param {import("@hapi/hapi").ResponseToolkit} _h
  * @return {Promise<import("@hapi/hapi").Lifecycle.ReturnValue>}
  */
-export async function deleteSongHandler(request, h) {
+export async function deleteSongHandler(request, _h) {
 	const { id } = request.params;
+	const { deleteSong } = request.server.methods;
 
-	try {
-		const rowCount = await request.server.methods.deleteSong(id);
+	await deleteSong(id);
 
-		if (rowCount <= 0) {
-			const boom = Boom.notFound("Song not found");
-			boom.reformat();
-			boom.output.payload.status = "fail";
-			return boom;
-		}
-
-		return h
-			.response({
-				status: "success",
-				message: "Song deleted successfully",
-			})
-			.code(200);
-	} catch (error) {
-		const boom = Boom.badImplementation(error.message);
-		boom.reformat();
-		boom.output.payload.status = "fail";
-		return boom;
-	}
-}
-
-/**
- * @return {Promise<import("@hapi/hapi").Lifecycle.ReturnValue>}
- */
-export async function notFoundHandler() {
-	const boom = Boom.notFound("Not found");
-	boom.reformat();
-	boom.output.payload.status = "fail";
-
-	return boom;
+	return {
+		status: "success",
+		message: "Song deleted successfully",
+	};
 }

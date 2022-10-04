@@ -2,6 +2,8 @@ import { randomUUID } from "node:crypto";
 
 import pg from "pg";
 
+import { NotFoundError } from "../utils/error/notfound-error.js";
+
 const { Pool } = pg;
 
 /**
@@ -33,37 +35,18 @@ export class SongsService {
 	 * @return {Promise<Array<import("./songs-service.js").Song>>}
 	 */
 	async getSongs(query) {
-		let sqlQuery;
+		let title = "";
+		let performer = "";
 
 		if (query) {
-			const { title, performer } = query;
-
-			if (title && performer) {
-				sqlQuery = {
-					text: "SELECT * FROM songs WHERE title ILIKE $1 AND performer ILIKE $2",
-					values: [title + "%", performer + "%"],
-				};
-			} else if (title) {
-				sqlQuery = {
-					text: "SELECT * FROM songs WHERE title ILIKE $1",
-					values: [title + "%"],
-				};
-			} else if (performer) {
-				sqlQuery = {
-					text: "SELECT * FROM songs WHERE performer ILIKE $1",
-					values: [performer + "%"],
-				};
-			} else {
-				sqlQuery = {
-					text: "SELECT * FROM songs",
-				};
-			}
-		} else {
-			sqlQuery = {
-				text: "SELECT * FROM songs",
-			};
+			title = query.title ?? "";
+			performer = query.performer ?? "";
 		}
 
+		const sqlQuery = {
+			text: "SELECT * FROM songs WHERE title ILIKE $1 AND performer ILIKE $2",
+			values: [`${title}%`, `${performer}%`],
+		};
 		const result = await this.#db.query(sqlQuery);
 
 		return result.rows.map(mapToSongObj);
@@ -72,6 +55,7 @@ export class SongsService {
 	/**
 	 * @param {string} id
 	 * @return {Promise<import("./songs-service.js").Song>}
+	 * @throw {NotFoundError}
 	 */
 	async getSong(id) {
 		const result = await this.#db.query({
@@ -79,7 +63,11 @@ export class SongsService {
 			values: [id],
 		});
 
-		return result.rows.map(mapToSongObj)[0] ?? undefined;
+		if (!result.rows.length) {
+			throw new NotFoundError("Song not found");
+		}
+
+		return result.rows.map(mapToSongObj)[0];
 	}
 
 	/**
@@ -110,6 +98,7 @@ export class SongsService {
 	 * @param {string} id
 	 * @param {import("./songs-service.js").Payload} payload
 	 * @return {Promise<number>}
+	 * @throw {NotFoundError}
 	 */
 	async updateSong(id, payload) {
 		const result = await this.#db.query({
@@ -137,18 +126,27 @@ export class SongsService {
 			],
 		});
 
+		if (result.rowCount <= 0) {
+			throw new NotFoundError("Fail to update a song");
+		}
+
 		return result.rowCount;
 	}
 
 	/**
 	 * @param {string} id
 	 * @return {Promise<number>}
+	 * @throw {NotFoundError}
 	 */
 	async deleteSong(id) {
 		const result = await this.#db.query({
 			text: "DELETE FROM songs WHERE id = $1 RETURNING id",
 			values: [id],
 		});
+
+		if (result.rowCount <= 0) {
+			throw new NotFoundError("Fail to delete a song");
+		}
 
 		return result.rowCount;
 	}

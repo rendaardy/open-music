@@ -22,7 +22,6 @@
 	"author": "Marenda S.A. <renda_ardy@tutanota.com>",
 	"license": "MIT",
 	"dependencies": {
-		"@hapi/boom": "^10.0.0",
 		"@hapi/hapi": "^20.2.2",
 		"core-js": "^3.25.2",
 		"dotenv": "^16.0.2",

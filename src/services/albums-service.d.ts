@@ -1,6 +1,6 @@
 import type * as pg from "pg";
 
-import "core-js/actual/array/group-to-map";
+import "core-js/actual/array/group-to-map.js";
 
 export type { Album } from "../entities.js";
 

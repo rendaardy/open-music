@@ -30,7 +30,7 @@ exports.up = (pgm) => {
 			notNull: true,
 		},
 		year: {
-			type: "integer",
+			type: "smallint",
 			notNull: true,
 		},
 		performer: {

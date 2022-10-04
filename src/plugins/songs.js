@@ -1,6 +1,6 @@
-import Boom from "@hapi/boom";
 import Joi from "joi";
 
+import { InvariantError } from "../utils/error/invariant-error.js";
 import {
 	getAllSongsHandler,
 	getSongHandler,
@@ -73,6 +73,9 @@ export const songsPlugin = {
 							title: Joi.string().trim(),
 							performer: Joi.string().trim(),
 						}),
+						async failAction(request, h, err) {
+							throw new InvariantError(/** @type {any} */ (err)?.details[0]?.message);
+						},
 					},
 					response: {
 						schema: getSongsResponseSchema,
@@ -88,6 +91,9 @@ export const songsPlugin = {
 						params: Joi.object({
 							id: Joi.string(),
 						}),
+						async failAction(request, h, err) {
+							throw new InvariantError(/** @type {any} */ (err)?.details[0]?.message);
+						},
 					},
 					response: {
 						schema: getSongResponseSchema,
@@ -102,11 +108,7 @@ export const songsPlugin = {
 					validate: {
 						payload: bodySchema,
 						async failAction(request, h, err) {
-							const error = Boom.badRequest(/** @type {any} */ (err)?.details[0]?.message);
-							error.reformat();
-							error.output.payload.status = "fail";
-
-							throw error;
+							throw new InvariantError(/** @type {any} */ (err)?.details[0]?.message);
 						},
 					},
 					response: {
@@ -125,11 +127,7 @@ export const songsPlugin = {
 						}),
 						payload: bodySchema,
 						async failAction(request, h, err) {
-							const error = Boom.badRequest(/** @type {any} */ (err)?.details[0]?.message);
-							error.reformat();
-							error.output.payload.status = "fail";
-
-							throw error;
+							throw new InvariantError(/** @type {any} */ (err)?.details[0]?.message);
 						},
 					},
 					response: {
@@ -146,6 +144,9 @@ export const songsPlugin = {
 						params: Joi.object({
 							id: Joi.string(),
 						}),
+						async failAction(request, h, err) {
+							throw new InvariantError(/** @type {any} */ (err)?.details[0]?.message);
+						},
 					},
 					response: {
 						schema: responseSchema,

@@ -14,3 +14,14 @@ export type Song = {
 	duration?: number;
 	albumId?: string;
 };
+
+export type User = {
+	id: string;
+	username: string;
+	fullname: string;
+};
+
+export type UserWithPassword = User & {
+	password: string;
+	salt: string;
+};

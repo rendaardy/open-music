@@ -2,12 +2,17 @@ import process from "node:process";
 
 import { server as hapiServer } from "@hapi/hapi";
 import pinoPlugin from "hapi-pino";
+import Jwt from "@hapi/jwt";
 import * as dotenv from "dotenv";
 
 import { albumsPlugin } from "./plugins/albums.js";
 import { songsPlugin } from "./plugins/songs.js";
+import { authPlugin } from "./plugins/authentications.js";
+import { usersPlugin } from "./plugins/users.js";
 import { albumsServicePlugin } from "./plugins/albums-service.js";
 import { songsServicePlugin } from "./plugins/songs-service.js";
+import { usersServicePlugin } from "./plugins/users-service.js";
+import { authServicePlugin } from "./plugins/authentications-service.js";
 import { ClientError } from "./utils/error/client-error.js";
 
 dotenv.config();
@@ -28,8 +33,36 @@ export async function initializeServer() {
 			redact: ["req.headers.authorization"],
 		},
 	});
+	await server.register(Jwt);
 
-	await server.register([albumsPlugin, songsPlugin, albumsServicePlugin, songsServicePlugin]);
+	await server.register([
+		albumsPlugin,
+		songsPlugin,
+		usersPlugin,
+		authPlugin,
+		albumsServicePlugin,
+		songsServicePlugin,
+		usersServicePlugin,
+		authServicePlugin,
+	]);
+
+	server.auth.strategy("open-music_jwt", "jwt", {
+		keys: process.env.ACCESS_TOKEN_KEY,
+		verify: {
+			aud: false,
+			iss: false,
+			sub: false,
+			maxAgeSec: process.env.ACCESS_TOKEN_AGE,
+		},
+		validate(artifacts, _request, _h) {
+			return {
+				isValid: true,
+				credentials: {
+					userId: artifacts.decoded.payload.userId,
+				},
+			};
+		},
+	});
 
 	server.ext("onPreResponse", (request, h) => {
 		const { response } = request;

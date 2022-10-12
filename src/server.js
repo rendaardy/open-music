@@ -9,10 +9,12 @@ import { albumsPlugin } from "./plugins/albums.js";
 import { songsPlugin } from "./plugins/songs.js";
 import { authPlugin } from "./plugins/authentications.js";
 import { usersPlugin } from "./plugins/users.js";
+import { playlistsPlugin } from "./plugins/playlists.js";
 import { albumsServicePlugin } from "./plugins/albums-service.js";
 import { songsServicePlugin } from "./plugins/songs-service.js";
 import { usersServicePlugin } from "./plugins/users-service.js";
 import { authServicePlugin } from "./plugins/authentications-service.js";
+import { playlistsServicePlugin } from "./plugins/playlists-service.js";
 import { ClientError } from "./utils/error/client-error.js";
 
 dotenv.config();
@@ -31,20 +33,13 @@ export async function initializeServer() {
 		plugin: pinoPlugin,
 		options: {
 			redact: ["req.headers.authorization"],
+			logPayload: process.env.NODE_ENV !== "production",
+			logQueryParams: true,
+			logPathParams: true,
+			logRouteTags: true,
 		},
 	});
-	await server.register(Jwt);
-
-	await server.register([
-		albumsPlugin,
-		songsPlugin,
-		usersPlugin,
-		authPlugin,
-		albumsServicePlugin,
-		songsServicePlugin,
-		usersServicePlugin,
-		authServicePlugin,
-	]);
+	await server.register([Jwt]);
 
 	server.auth.strategy("open-music_jwt", "jwt", {
 		keys: process.env.ACCESS_TOKEN_KEY,
@@ -63,6 +58,19 @@ export async function initializeServer() {
 			};
 		},
 	});
+
+	await server.register([
+		albumsPlugin,
+		songsPlugin,
+		usersPlugin,
+		authPlugin,
+		playlistsPlugin,
+		albumsServicePlugin,
+		songsServicePlugin,
+		usersServicePlugin,
+		authServicePlugin,
+		playlistsServicePlugin,
+	]);
 
 	server.ext("onPreResponse", (request, h) => {
 		const { response } = request;
@@ -84,7 +92,10 @@ export async function initializeServer() {
 			return h
 				.response({
 					status: "error",
-					message: "An internal server error occurred",
+					message:
+						process.env.NODE_ENV === "production"
+							? "An internal server error occurred"
+							: response.message,
 				})
 				.code(500);
 		}

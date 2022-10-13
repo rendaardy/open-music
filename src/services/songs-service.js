@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 
 import pg from "pg";
 
-import { NotFoundError } from "../utils/error/notfound-error.js";
+import { NotFoundError } from "../utils/error.js";
 
 const { Pool } = pg;
 
@@ -63,7 +63,7 @@ export class SongsService {
 			values: [id],
 		});
 
-		if (!result.rows.length) {
+		if (result.rows.length <= 0) {
 			throw new NotFoundError("Song not found");
 		}
 

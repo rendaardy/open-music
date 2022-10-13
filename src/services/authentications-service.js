@@ -1,6 +1,6 @@
 import pg from "pg";
 
-import { InvariantError } from "../utils/error/invariant-error.js";
+import { InvariantError } from "../utils/error.js";
 
 const { Pool } = pg;
 
@@ -32,7 +32,7 @@ export class AuthenticationsService {
 			values: [token],
 		});
 
-		if (!result.rows.length) {
+		if (result.rows.length <= 0) {
 			throw new InvariantError("Invalid refresh token");
 		}
 	}

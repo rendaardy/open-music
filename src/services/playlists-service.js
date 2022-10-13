@@ -1,9 +1,7 @@
 import { randomUUID } from "node:crypto";
 import pg from "pg";
 
-import { InvariantError } from "../utils/error/invariant-error.js";
-import { NotFoundError } from "../utils/error/notfound-error.js";
-import { AuthorizationError } from "../utils/error/authorization-error.js";
+import { InvariantError, NotFoundError, AuthorizationError } from "../utils/error.js";
 
 import "core-js/actual/array/group-to-map.js";
 

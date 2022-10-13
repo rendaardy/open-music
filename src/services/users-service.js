@@ -2,9 +2,7 @@ import { randomUUID, randomBytes } from "node:crypto";
 import pg from "pg";
 
 import { createPasswordHash, compare } from "../utils/hash.js";
-import { NotFoundError } from "../utils/error/notfound-error.js";
-import { InvariantError } from "../utils/error/invariant-error.js";
-import { AuthenticationError } from "../utils/error/authentication-error.js";
+import { NotFoundError, InvariantError, AuthenticationError } from "../utils/error.js";
 
 const { Pool } = pg;
 
@@ -36,7 +34,7 @@ export class UsersService {
 			values: [id, username, hashedPassword, salt, fullname],
 		});
 
-		if (!result.rows.length) {
+		if (result.rowCount <= 0) {
 			throw new InvariantError("Fail to adding a user");
 		}
 
@@ -54,7 +52,7 @@ export class UsersService {
 			values: [userId],
 		});
 
-		if (!result.rows.length) {
+		if (result.rows.length <= 0) {
 			throw new NotFoundError("User not found");
 		}
 
@@ -73,7 +71,7 @@ export class UsersService {
 			values: [username],
 		});
 
-		if (!result.rows.length) {
+		if (result.rows.length <= 0) {
 			throw new AuthenticationError("Username or password is incorrect");
 		}
 

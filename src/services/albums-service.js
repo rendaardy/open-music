@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 
 import pg from "pg";
 
-import { NotFoundError } from "../utils/error/notfound-error.js";
+import { NotFoundError } from "../utils/error.js";
 
 import "core-js/actual/array/group-to-map.js";
 

@@ -6,11 +6,12 @@ export const albumsServicePlugin = {
 	async register(server) {
 		const service = new AlbumsService();
 
-		server.method("addAlbum", service.addAlbum, { bind: service });
-		server.method("getAlbums", service.getAlbums, { bind: service });
-		server.method("getAlbum", service.getAlbum, { bind: service });
-		server.method("updateAlbum", service.updateAlbum, { bind: service });
-		server.method("deleteAlbum", service.deleteAlbum, { bind: service });
+		server.bind(service);
+		server.method("addAlbum", service.addAlbum);
+		server.method("getAlbums", service.getAlbums);
+		server.method("getAlbum", service.getAlbum);
+		server.method("updateAlbum", service.updateAlbum);
+		server.method("deleteAlbum", service.deleteAlbum);
 
 		server.ext("onPostStop", async () => {
 			await service.close();

@@ -35,3 +35,10 @@ export type Playlist = {
 export type PlaylistWithSongs = Playlist & {
 	songs: Array<Pick<Song, "id" | "title" | "performer">>;
 };
+
+export type PlaylistActivity = {
+	username: string;
+	title: string;
+	action: string;
+	time: string;
+};

@@ -7,6 +7,7 @@ import {
 	postSongToPlaylistHandler,
 	getSongsInPlaylistHandler,
 	deleteSongFromPlaylistByIdHandler,
+	getPlaylistActivitiesHandler,
 } from "../handlers/playlists.js";
 import { InvariantError } from "../utils/error/invariant-error.js";
 import { NotFoundError } from "../utils/error/notfound-error.js";
@@ -56,6 +57,18 @@ const responseSchema = Joi.object({
 							)
 							.required(),
 					}).required(),
+				}),
+			getActivities: (schema) =>
+				schema.append({
+					playlistId: Joi.string().required(),
+					activities: Joi.array().items(
+						Joi.object({
+							username: Joi.string().required(),
+							title: Joi.string().required(),
+							action: Joi.string().required(),
+							time: Joi.string().required(),
+						}),
+					),
 				}),
 		})
 		.optional(),
@@ -183,6 +196,25 @@ export const playlistsPlugin = {
 					},
 					response: {
 						schema: responseSchema,
+					},
+				},
+			},
+			{
+				method: "GET",
+				path: "/playlists/{id}/activities",
+				handler: getPlaylistActivitiesHandler,
+				options: {
+					auth: "open-music_jwt",
+					validate: {
+						params: Joi.object({
+							id: Joi.string().required(),
+						}),
+						async failAction(request, h, err) {
+							throw new InvariantError(/** @type {any} */ (err)?.details[0]?.message);
+						},
+					},
+					response: {
+						schema: responseSchema.tailor("getActivities"),
 					},
 				},
 			},

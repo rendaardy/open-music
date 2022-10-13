@@ -121,3 +121,25 @@ export async function deleteSongFromPlaylistByIdHandler(request, _h) {
 		message: "Song deleted from the playlist successfully",
 	};
 }
+
+/**
+ * @param {import("@hapi/hapi").Request} request
+ * @param {import("@hapi/hapi").ResponseToolkit} _h
+ * @return {Promise<import("@hapi/hapi").Lifecycle.ReturnValue>}
+ */
+export async function getPlaylistActivitiesHandler(request, _h) {
+	const { id } = request.params;
+	const { userId: owner } = /** @type {{ userId: string }} */ (request.auth.credentials);
+	const { verifyPlaylistAccess, getPlaylistActivities } = request.server.methods;
+
+	await verifyPlaylistAccess(id, owner);
+
+	const playlistActivities = await getPlaylistActivities(id);
+
+	return {
+		status: "success",
+		data: {
+			...playlistActivities,
+		},
+	};
+}

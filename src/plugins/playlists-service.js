@@ -11,6 +11,7 @@ export const playlistsServicePlugin = {
 		server.method("getPlaylists", service.getPlaylists);
 		server.method("deletePlaylistById", service.deletePlaylistById);
 		server.method("verifyPlaylistOwner", service.verifyPlaylistOwner);
+		server.method("getPlaylistActivities", service.getPlaylistActivities);
 		server.method("addSongToPlaylist", service.addSongToPlaylist);
 		server.method("getSongsInPlaylist", service.getSongsInPlaylist);
 		server.method("deleteSongFromPlaylistById", service.deleteSongFromPlaylistById);

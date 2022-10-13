@@ -1,6 +1,11 @@
 import type * as pg from "pg";
 
-export type { Playlist, PlaylistWithSongs } from "../entities.js";
+export type { Playlist, PlaylistWithSongs, PlaylistActivity } from "../entities.js";
+
+export type PlaylistActivities = {
+	playlistId: string;
+	activities: PlaylistActivity[];
+};
 
 export declare class PlaylistsService {
 	#db: pg.Pool;
@@ -12,6 +17,15 @@ export declare class PlaylistsService {
 	async deletePlaylistById(id: string): Promise<void>;
 
 	async verifyPlaylistOwner(id: string, owner: string): Promise<void>;
+
+	async #recordPlaylistActivity(
+		client: pg.PoolClient,
+		playlistId: string,
+		songId: string,
+		action: "add" | "delete",
+	): Promise<void>;
+
+	async getPlaylistActivities(playlistId: string): Promise<PlaylistActivities>;
 
 	async addSongToPlaylist(songId: string, playlistId: string): Promise<void>;
 

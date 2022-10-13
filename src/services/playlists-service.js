@@ -46,8 +46,9 @@ export class PlaylistsService {
 			text: `
         SELECT p.id, p.name, u.username 
         FROM playlists AS p
+        LEFT JOIN collaborations AS c ON c.playlist_id = p.id 
         INNER JOIN users AS u ON u.id = p.owner
-        WHERE p.owner = $1
+        WHERE p.owner = $1 OR c.user_id = $1
       `,
 			values: [owner],
 		});
@@ -94,19 +95,106 @@ export class PlaylistsService {
 	}
 
 	/**
+	 * @param {pg.PoolClient} client
+	 * @param {string} playlistId
+	 * @param {string} songId
+	 * @param {"add" | "delete"} action
+	 * @throws {InvariantError}
+	 */
+	async #recordPlaylistActivity(client, playlistId, songId, action) {
+		const queryResult = await client.query({
+			text: "SELECT owner FROM playlists WHERE id = $1",
+			values: [playlistId],
+		});
+
+		if (queryResult.rows.length <= 0) {
+			throw new InvariantError(`Failed to record activity on action ${action}. Playlist not found`);
+		}
+
+		const id = `activities-${randomUUID()}`;
+		const now = new Date();
+		const userId = queryResult.rows[0].owner;
+
+		const result = await client.query({
+			text: `
+        INSERT INTO 
+          playlist_song_activities(id, playlist_id, song_id, user_id, action, time) 
+        VALUES 
+          ($1, $2, $3, $4, $5, $6)
+      `,
+			values: [id, playlistId, songId, userId, action, now],
+		});
+
+		if (result.rowCount <= 0) {
+			throw new InvariantError(`Failed to record activity on action ${action}`);
+		}
+	}
+
+	/**
+	 * @param {string} playlistId
+	 * @return {Promise<import("./playlists-service.js").PlaylistActivities>}
+	 */
+	async getPlaylistActivities(playlistId) {
+		const result = await this.#db.query({
+			text: `
+        SELECT psa.playlist_id, u.username, s.title, psa.action, psa.time
+        FROM playlist_song_activities AS psa
+        INNER JOIN users AS u ON u.id = psa.user_id
+        INNER JOIN songs AS s ON s.id = psa.song_id
+        WHERE psa.playlist_id = $1
+        ORDER BY psa.time ASC
+      `,
+			values: [playlistId],
+		});
+
+		if (result.rows.length <= 0) {
+			throw new NotFoundError("Playlist not found");
+		}
+
+		// @ts-ignore
+		const activityMap = result.rows.groupToMap(({ playlist_id: id }) => id);
+		const activities = activityMap.get(playlistId);
+
+		return {
+			playlistId,
+			activities: activities.map((activity) => ({
+				username: activity.username,
+				title: activity.title,
+				action: activity.action,
+				time: activity.time.toISOString(),
+			})),
+		};
+	}
+
+	/**
 	 * @param {string} songId
 	 * @param {string} playlistId
 	 * @throws {InvariantError}
 	 */
 	async addSongToPlaylist(songId, playlistId) {
-		const id = `playlist_song-${randomUUID()}`;
-		const result = await this.#db.query({
-			text: "INSERT INTO playlist_song(id, playlist_id, song_id) VALUES ($1, $2, $3)",
-			values: [id, playlistId, songId],
-		});
+		const client = await this.#db.connect();
 
-		if (result.rowCount <= 0) {
-			throw new InvariantError("Failed to add a song to playlist");
+		try {
+			await client.query("BEGIN");
+
+			const id = `playlist_song-${randomUUID()}`;
+			const result = await client.query({
+				text: "INSERT INTO playlist_song(id, playlist_id, song_id) VALUES ($1, $2, $3)",
+				values: [id, playlistId, songId],
+			});
+
+			if (result.rowCount <= 0) {
+				throw new InvariantError("Failed to add a song to playlist");
+			}
+
+			await this.#recordPlaylistActivity(client, playlistId, songId, "add");
+
+			await client.query("COMMIT");
+		} catch (error) {
+			await client.query("ROLLBACK");
+			throw error;
+		} finally {
+			client.release();
 		}
 	}
 
@@ -119,18 +207,17 @@ export class PlaylistsService {
 		const result = await this.#db.query({
 			text: `
         SELECT 
-          p.id AS playlist_id, 
+          ps.playlist_id, 
           p.name, 
           u.username, 
-          s.id AS song_id,
+          ps.song_id,
           s.title, 
           s.performer
-        FROM playlists AS p
+        FROM playlist_song AS ps
+        INNER JOIN playlists AS p ON p.id = ps.playlist_id
         INNER JOIN users AS u ON u.id = p.owner
-        INNER JOIN playlist_song AS ps ON ps.playlist_id = p.id
         INNER JOIN songs AS s ON s.id = ps.song_id
-        WHERE p.id = $1
-        GROUP BY p.id, s.id, u.username
+        WHERE ps.playlist_id = $1
       `,
 			values: [id],
 		});
@@ -168,13 +255,30 @@ export class PlaylistsService {
 	 * @throws {NotFoundError}
 	 */
 	async deleteSongFromPlaylistById(songId) {
-		const result = await this.#db.query({
-			text: "DELETE FROM playlist_song WHERE song_id = $1",
-			values: [songId],
-		});
+		const client = await this.#db.connect();
 
-		if (result.rowCount <= 0) {
-			throw new NotFoundError("Failed to delete a song from playlist");
+		try {
+			await client.query("BEGIN");
+
+			const result = await client.query({
+				text: "DELETE FROM playlist_song WHERE song_id = $1 RETURNING playlist_id",
+				values: [songId],
+			});
+
+			if (result.rowCount <= 0) {
+				throw new NotFoundError("Failed to delete a song from playlist");
+			}
+
+			const playlistId = result.rows[0].playlist_id;
+
+			await this.#recordPlaylistActivity(client, playlistId, songId, "delete");
+
+			await client.query("COMMIT");
+		} catch (error) {
+			await client.query("ROLLBACK");
+			throw error;
+		} finally {
+			client.release();
 		}
 	}
 

@@ -13,8 +13,6 @@ export declare class PlaylistsService {
 
 	async verifyPlaylistOwner(id: string, owner: string): Promise<void>;
 
-	async verifyPlaylistAccess(id: string, owner: string): Promise<void>;
-
 	async addSongToPlaylist(songId: string, playlistId: string): Promise<void>;
 
 	async getSongsInPlaylist(id: string): Promise<PlaylistWithSongs>;

@@ -10,11 +10,13 @@ import { songsPlugin } from "./plugins/songs.js";
 import { authPlugin } from "./plugins/authentications.js";
 import { usersPlugin } from "./plugins/users.js";
 import { playlistsPlugin } from "./plugins/playlists.js";
+import { collabPlugin } from "./plugins/collaborations.js";
 import { albumsServicePlugin } from "./plugins/albums-service.js";
 import { songsServicePlugin } from "./plugins/songs-service.js";
 import { usersServicePlugin } from "./plugins/users-service.js";
 import { authServicePlugin } from "./plugins/authentications-service.js";
 import { playlistsServicePlugin } from "./plugins/playlists-service.js";
+import { collabServicePlugin } from "./plugins/collaborations-service.js";
 import { ClientError } from "./utils/error/client-error.js";
 
 dotenv.config();
@@ -65,11 +67,13 @@ export async function initializeServer() {
 		usersPlugin,
 		authPlugin,
 		playlistsPlugin,
+		collabPlugin,
 		albumsServicePlugin,
 		songsServicePlugin,
 		usersServicePlugin,
 		authServicePlugin,
 		playlistsServicePlugin,
+		collabServicePlugin,
 	]);
 
 	server.ext("onPreResponse", (request, h) => {

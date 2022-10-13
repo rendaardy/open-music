@@ -30,7 +30,7 @@ export class PlaylistsService {
 			values: [id, name, owner],
 		});
 
-		if (!result.rows[0].id) {
+		if (result.rowCount <= 0) {
 			throw new InvariantError("Failed to add a playlist");
 		}
 
@@ -65,7 +65,7 @@ export class PlaylistsService {
 			values: [id],
 		});
 
-		if (!result.rows.length) {
+		if (result.rowCount <= 0) {
 			throw new NotFoundError("Failed to delete a playlist");
 		}
 	}
@@ -78,11 +78,11 @@ export class PlaylistsService {
 	 */
 	async verifyPlaylistOwner(id, owner) {
 		const result = await this.#db.query({
-			text: "SELECT id, name, owner FROM playlists WHERE id = $1",
+			text: "SELECT owner FROM playlists WHERE id = $1",
 			values: [id],
 		});
 
-		if (!result.rows.length) {
+		if (result.rows.length <= 0) {
 			throw new NotFoundError("Playlist not found");
 		}
 
@@ -94,16 +94,6 @@ export class PlaylistsService {
 	}
 
 	/**
-	 * @param {string} _id
-	 * @param {string} _owner
-	 * @throws {NotFoundError}
-	 * @throws {AuthorizationError}
-	 */
-	async verifyPlaylistAccess(_id, _owner) {
-		// TODO: unimplemented
-	}
-
-	/**
 	 * @param {string} songId
 	 * @param {string} playlistId
 	 * @throws {InvariantError}
@@ -111,11 +101,11 @@ export class PlaylistsService {
 	async addSongToPlaylist(songId, playlistId) {
 		const id = `playlist_song-${randomUUID()}`;
 		const result = await this.#db.query({
-			text: "INSERT INTO playlist_song(id, playlist_id, song_id) VALUES ($1, $2, $3) RETURNING id",
+			text: "INSERT INTO playlist_song(id, playlist_id, song_id) VALUES ($1, $2, $3)",
 			values: [id, playlistId, songId],
 		});
 
-		if (!result.rows[0].id) {
+		if (result.rowCount <= 0) {
 			throw new InvariantError("Failed to add a song to playlist");
 		}
 	}
@@ -145,7 +135,7 @@ export class PlaylistsService {
 			values: [id],
 		});
 
-		if (!result.rows.length) {
+		if (result.rows.length <= 0) {
 			throw new NotFoundError("Playlist not found");
 		}
 
@@ -156,10 +146,10 @@ export class PlaylistsService {
 
 		for (const playlistId of playlistMap.keys()) {
 			const songs = playlistMap.get(playlistId);
-			const playlistDetail = songs.map((song) => song.playlist_id === playlistId);
+			const playlistDetail = songs.find((song) => song.playlist_id === playlistId);
 
 			playlist = {
-				id: playlistDetail.id,
+				id: playlistDetail.playlist_id,
 				name: playlistDetail.name,
 				username: playlistDetail.username,
 				songs: songs.map((song) => ({
@@ -183,7 +173,7 @@ export class PlaylistsService {
 			values: [songId],
 		});
 
-		if (!result.rows.length) {
+		if (result.rowCount <= 0) {
 			throw new NotFoundError("Failed to delete a song from playlist");
 		}
 	}

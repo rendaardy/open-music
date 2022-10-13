@@ -5,7 +5,7 @@ export class AuthorizationError extends ClientError {
 	 * @param {string} message
 	 */
 	constructor(message) {
-		super(message, 401);
+		super(message, 403);
 
 		/**
 		 * @public

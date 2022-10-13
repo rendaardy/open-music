@@ -66,9 +66,10 @@ export async function postSongToPlaylistHandler(request, h) {
 	const { id } = request.params;
 	const { songId } = /** @type {{ songId: string }} */ (request.payload);
 	const { userId: owner } = /** @type {{ userId: string }} */ (request.auth.credentials);
-	const { verifyPlaylistOwner, addSongToPlaylist } = request.server.methods;
+	const { verifyPlaylistAccess, addSongToPlaylist, isSongAvailable } = request.server.methods;
 
-	await verifyPlaylistOwner(id, owner);
+	await verifyPlaylistAccess(id, owner);
+	await isSongAvailable(songId);
 	await addSongToPlaylist(songId, id);
 
 	return h
@@ -87,16 +88,16 @@ export async function postSongToPlaylistHandler(request, h) {
 export async function getSongsInPlaylistHandler(request, _h) {
 	const { id } = request.params;
 	const { userId: owner } = /** @type {{ userId: string }} */ (request.auth.credentials);
-	const { verifyPlaylistOwner, getSongsInPlaylist } = request.server.methods;
+	const { verifyPlaylistAccess, getSongsInPlaylist } = request.server.methods;
 
-	await verifyPlaylistOwner(id, owner);
+	await verifyPlaylistAccess(id, owner);
 
-	const playlists = await getSongsInPlaylist(id);
+	const playlist = await getSongsInPlaylist(id);
 
 	return {
 		status: "success",
 		data: {
-			playlists,
+			playlist,
 		},
 	};
 }
@@ -110,9 +111,9 @@ export async function deleteSongFromPlaylistByIdHandler(request, _h) {
 	const { id } = request.params;
 	const { songId } = /** @type {{ songId: string }} */ (request.payload);
 	const { userId: owner } = /** @type {{ userId: string }} */ (request.auth.credentials);
-	const { verifyPlaylistOwner, deleteSongFromPlaylistById } = request.server.methods;
+	const { verifyPlaylistAccess, deleteSongFromPlaylistById } = request.server.methods;
 
-	await verifyPlaylistOwner(id, owner);
+	await verifyPlaylistAccess(id, owner);
 	await deleteSongFromPlaylistById(songId);
 
 	return {

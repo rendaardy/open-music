@@ -9,6 +9,7 @@ import {
 	deleteSongFromPlaylistByIdHandler,
 } from "../handlers/playlists.js";
 import { InvariantError } from "../utils/error/invariant-error.js";
+import { NotFoundError } from "../utils/error/notfound-error.js";
 
 const playlistBodySchema = Joi.object({
 	name: Joi.string().trim().required(),
@@ -63,9 +64,69 @@ const responseSchema = Joi.object({
 /** @type {import("@hapi/hapi").Plugin<undefined>} */
 export const playlistsPlugin = {
 	name: "app/playlists",
-	dependencies: ["app/playlists-service"],
+	dependencies: ["app/playlists-service", "app/collaborations-service", "app/songs-service"],
 	async register(server) {
+		server.method("verifyPlaylistAccess", async (playlistId, owner) => {
+			try {
+				await server.methods.verifyPlaylistOwner(playlistId, owner);
+			} catch (error) {
+				if (error instanceof NotFoundError) {
+					throw error;
+				}
+
+				// eslint-disable-next-line no-useless-catch
+				try {
+					await server.methods.verifyCollaborator(playlistId, owner);
+				} catch (error) {
+					throw error;
+				}
+			}
+		});
+
+		server.method("isSongAvailable", async (songId) => {
+			await server.methods.getSong(songId);
+		});
+
 		server.route([
+			{
+				method: "POST",
+				path: "/playlists",
+				handler: postPlaylistHandler,
+				options: {
+					auth: "open-music_jwt",
+					validate: {
+						payload: playlistBodySchema,
+						async failAction(request, h, err) {
+							throw new InvariantError(/** @type {any} */ (err)?.details[0]?.message);
+						},
+					},
+					response: {
+						schema: responseSchema.tailor("postPlaylist"),
+					},
+				},
+			},
+			{
+				method: "GET",
+				path: "/playlists",
+				handler: getPlaylistsHandler,
+				options: {
+					auth: "open-music_jwt",
+					response: {
+						schema: responseSchema.tailor("getPlaylists"),
+					},
+				},
+			},
+			{
+				method: "DELETE",
+				path: "/playlists/{id}",
+				handler: deletePlaylistByIdHandler,
+				options: {
+					auth: "open-music_jwt",
+					response: {
+						schema: responseSchema,
+					},
+				},
+			},
 			{
 				method: "POST",
 				path: "/playlists/{id}/songs",
@@ -120,45 +181,6 @@ export const playlistsPlugin = {
 							throw new InvariantError(/** @type {any} */ (err)?.details[0]?.message);
 						},
 					},
-					response: {
-						schema: responseSchema,
-					},
-				},
-			},
-			{
-				method: "POST",
-				path: "/playlists",
-				handler: postPlaylistHandler,
-				options: {
-					auth: "open-music_jwt",
-					validate: {
-						payload: playlistBodySchema,
-						async failAction(request, h, err) {
-							throw new InvariantError(/** @type {any} */ (err)?.details[0]?.message);
-						},
-					},
-					response: {
-						schema: responseSchema.tailor("postPlaylist"),
-					},
-				},
-			},
-			{
-				method: "GET",
-				path: "/playlists",
-				handler: getPlaylistsHandler,
-				options: {
-					auth: "open-music_jwt",
-					response: {
-						schema: responseSchema.tailor("getPlaylists"),
-					},
-				},
-			},
-			{
-				method: "DELETE",
-				path: "/playlists",
-				handler: deletePlaylistByIdHandler,
-				options: {
-					auth: "open-music_jwt",
 					response: {
 						schema: responseSchema,
 					},

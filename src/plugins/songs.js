@@ -1,6 +1,6 @@
 import Joi from "joi";
 
-import { InvariantError } from "../utils/error/invariant-error.js";
+import { InvariantError } from "../utils/error.js";
 import {
 	getAllSongsHandler,
 	getSongHandler,

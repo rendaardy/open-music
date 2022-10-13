@@ -6,11 +6,12 @@ export const songsServicePlugin = {
 	async register(server) {
 		const service = new SongsService();
 
-		server.method("addSong", service.addSong, { bind: service });
-		server.method("getSongs", service.getSongs, { bind: service });
-		server.method("getSong", service.getSong, { bind: service });
-		server.method("updateSong", service.updateSong, { bind: service });
-		server.method("deleteSong", service.deleteSong, { bind: service });
+		server.bind(service);
+		server.method("addSong", service.addSong);
+		server.method("getSongs", service.getSongs);
+		server.method("getSong", service.getSong);
+		server.method("updateSong", service.updateSong);
+		server.method("deleteSong", service.deleteSong);
 
 		server.ext("onPostStop", async () => {
 			await service.close();

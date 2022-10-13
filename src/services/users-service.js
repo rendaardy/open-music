@@ -52,7 +52,7 @@ export class UsersService {
 			values: [userId],
 		});
 
-		if (result.rows.length <= 0) {
+		if (result.rowCount <= 0) {
 			throw new NotFoundError("User not found");
 		}
 
@@ -71,7 +71,7 @@ export class UsersService {
 			values: [username],
 		});
 
-		if (result.rows.length <= 0) {
+		if (result.rowCount <= 0) {
 			throw new AuthenticationError("Username or password is incorrect");
 		}
 
@@ -95,7 +95,7 @@ export class UsersService {
 			values: [username],
 		});
 
-		if (result.rows.length > 0) {
+		if (result.rowCount > 0) {
 			throw new InvariantError("Username already exists");
 		}
 	}

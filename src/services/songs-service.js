@@ -31,20 +31,19 @@ export class SongsService {
 	}
 
 	/**
-	 * @param {{ title?: string, performer?: string }} [query]
+	 * @param {{ title: string, performer: string }} query
 	 * @return {Promise<Array<import("./songs-service.js").Song>>}
 	 */
-	async getSongs(query) {
-		let title = "";
-		let performer = "";
-
-		if (query) {
-			title = query.title ?? "";
-			performer = query.performer ?? "";
-		}
-
+	async getSongs({ title = "", performer = "" }) {
 		const sqlQuery = {
-			text: "SELECT * FROM songs WHERE title ILIKE $1 AND performer ILIKE $2",
+			text: `
+        SELECT 
+          id, title, year, performer, genre, duration, albumId 
+        FROM 
+          songs 
+        WHERE 
+          title ILIKE $1 AND performer ILIKE $2
+      `,
 			values: [`${title}%`, `${performer}%`],
 		};
 		const result = await this.#db.query(sqlQuery);
@@ -59,11 +58,18 @@ export class SongsService {
 	 */
 	async getSong(id) {
 		const result = await this.#db.query({
-			text: "SELECT * FROM songs WHERE id = $1",
+			text: `
+        SELECT 
+          id, title, year, performer, genre, duration, albumId 
+        FROM 
+          songs 
+        WHERE 
+          id = $1
+      `,
 			values: [id],
 		});
 
-		if (result.rows.length <= 0) {
+		if (result.rowCount <= 0) {
 			throw new NotFoundError("Song not found");
 		}
 

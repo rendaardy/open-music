@@ -7,7 +7,7 @@ export type Payload = Omit<Song, "id">;
 export declare class SongsService {
 	#db: pg.Pool;
 
-	async getSongs(): Promise<Song[]>;
+	async getSongs(query: { title: string; performer: string }): Promise<Song[]>;
 
 	async getSong(id: string): Promise<Song>;
 

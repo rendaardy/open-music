@@ -80,7 +80,7 @@ export class AlbumsService {
 			values: [id],
 		});
 
-		if (result.rows.length <= 0) {
+		if (result.rowCount <= 0) {
 			throw new NotFoundError("Album not found");
 		}
 

@@ -81,7 +81,7 @@ export class PlaylistsService {
 			values: [id],
 		});
 
-		if (result.rows.length <= 0) {
+		if (result.rowCount <= 0) {
 			throw new NotFoundError("Playlist not found");
 		}
 
@@ -105,22 +105,21 @@ export class PlaylistsService {
 			values: [playlistId],
 		});
 
-		if (queryResult.rows.length <= 0) {
+		if (queryResult.rowCount <= 0) {
 			throw new InvariantError(`Failed to record activity on action ${action}. Playlist not found`);
 		}
 
 		const id = `activities-${randomUUID()}`;
-		const now = new Date();
 		const userId = queryResult.rows[0].owner;
 
 		const result = await client.query({
 			text: `
         INSERT INTO 
-          playlist_song_activities(id, playlist_id, song_id, user_id, action, time) 
+          playlist_song_activities(id, playlist_id, song_id, user_id, action) 
         VALUES 
-          ($1, $2, $3, $4, $5, $6)
+          ($1, $2, $3, $4, $5)
       `,
-			values: [id, playlistId, songId, userId, action, now],
+			values: [id, playlistId, songId, userId, action],
 		});
 
 		if (result.rowCount <= 0) {
@@ -145,7 +144,7 @@ export class PlaylistsService {
 			values: [playlistId],
 		});
 
-		if (result.rows.length <= 0) {
+		if (result.rowCount <= 0) {
 			throw new NotFoundError("Playlist not found");
 		}
 
@@ -220,7 +219,7 @@ export class PlaylistsService {
 			values: [id],
 		});
 
-		if (result.rows.length <= 0) {
+		if (result.rowCount <= 0) {
 			throw new NotFoundError("Playlist not found");
 		}
 

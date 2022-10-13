@@ -32,7 +32,7 @@ export class AuthenticationsService {
 			values: [token],
 		});
 
-		if (result.rows.length <= 0) {
+		if (result.rowCount <= 0) {
 			throw new InvariantError("Invalid refresh token");
 		}
 	}

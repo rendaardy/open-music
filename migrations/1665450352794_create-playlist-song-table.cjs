@@ -1,7 +1,5 @@
 /* eslint-disable camelcase */
 
-exports.shorthands = undefined;
-
 /**
  * @function
  * @param {import("node-pg-migrate").MigrationBuilder} pgm

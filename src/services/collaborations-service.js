@@ -60,7 +60,7 @@ export class CollaborationsService {
 			values: [playlistId, userId],
 		});
 
-		if (result.rows.length <= 0) {
+		if (result.rowCount <= 0) {
 			throw new AuthorizationError("You're prohibited to get access of this resource");
 		}
 	}

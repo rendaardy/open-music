@@ -1,7 +1,7 @@
 import process from "node:process";
 import Jwt from "@hapi/jwt";
 
-import { InvariantError } from "../utils/error/invariant-error.js";
+import { InvariantError } from "./error.js";
 
 /**
  * @param {any} payload

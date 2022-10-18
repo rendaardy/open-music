@@ -1,6 +1,6 @@
 import type * as pg from "pg";
 
-export type { User, UserWithPassword } from "../../../entities.js";
+export type { User, UserWithPassword } from "#open-music/entities.js";
 
 export type Payload = Omit<UserWithPassword, "id", "salt">;
 

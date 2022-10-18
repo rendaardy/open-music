@@ -9,7 +9,7 @@ import {
 	deleteSongFromPlaylistByIdHandler,
 	getPlaylistActivitiesHandler,
 } from "./handlers/playlists.js";
-import { InvariantError, NotFoundError } from "../../utils/error.js";
+import { InvariantError, NotFoundError } from "#open-music/utils/error.js";
 
 const playlistBodySchema = Joi.object({
 	name: Joi.string().trim().required(),

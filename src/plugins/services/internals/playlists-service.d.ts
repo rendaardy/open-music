@@ -1,6 +1,6 @@
 import type * as pg from "pg";
 
-export type { Playlist, PlaylistWithSongs, PlaylistActivity } from "../../../entities.js";
+export type { Playlist, PlaylistWithSongs, PlaylistActivity } from "#open-music/entities.js";
 
 export type PlaylistActivities = {
 	playlistId: string;

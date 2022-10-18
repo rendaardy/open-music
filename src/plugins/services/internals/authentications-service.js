@@ -1,6 +1,6 @@
 import pg from "pg";
 
-import { InvariantError } from "../../../utils/error.js";
+import { InvariantError } from "#open-music/utils/error.js";
 
 const { Pool } = pg;
 

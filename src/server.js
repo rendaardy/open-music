@@ -19,7 +19,7 @@ import { authServicePlugin } from "./plugins/services/authentications-service.js
 import { playlistsServicePlugin } from "./plugins/services/playlists-service.js";
 import { collabServicePlugin } from "./plugins/services/collaborations-service.js";
 
-import { ClientError } from "./utils/error.js";
+import { ClientError } from "#open-music/utils/error.js";
 
 dotenv.config();
 

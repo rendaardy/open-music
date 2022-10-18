@@ -4,7 +4,7 @@ import {
 	postCollaborationsHandler,
 	deleteCollaborationsHandler,
 } from "./handlers/collaborations.js";
-import { InvariantError } from "../../utils/error.js";
+import { InvariantError } from "#open-music/utils/error.js";
 
 const bodySchema = Joi.object({
 	playlistId: Joi.string().trim().required(),

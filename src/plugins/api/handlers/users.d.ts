@@ -1,6 +1,6 @@
 import type { Request, ResponseToolkit, Lifecycle } from "@hapi/hapi";
 
-import type { UserWithPassword } from "../entities.js";
+import type { UserWithPassword } from "#open-music/entities.js";
 
 export type RequestPayload = Pick<UserWithPassword, "username" | "password" | "fullname">;
 

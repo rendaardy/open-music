@@ -1,7 +1,7 @@
 import Joi from "joi";
 
 import { postUserHandler, getUserByIdHandler } from "./handlers/users.js";
-import { InvariantError } from "../../utils/error.js";
+import { InvariantError } from "#open-music/utils/error.js";
 
 const bodySchema = Joi.object({
 	username: Joi.string().trim().required(),

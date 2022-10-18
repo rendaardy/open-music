@@ -2,7 +2,7 @@ import type * as pg from "pg";
 
 import "core-js/actual/array/group-to-map.js";
 
-export type { Album } from "../../../entities.js";
+export type { Album } from "#open-music/entities.js";
 
 export type Payload = Pick<Album, "name" | "year">;
 

@@ -1,6 +1,6 @@
 import Joi from "joi";
 
-import { InvariantError } from "../../utils/error.js";
+import { InvariantError } from "#open-music/utils/error.js";
 import {
 	getAllSongsHandler,
 	getSongHandler,

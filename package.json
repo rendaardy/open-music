@@ -5,6 +5,9 @@
 	"main": "src/index.js",
 	"private": true,
 	"type": "module",
+	"imports": {
+		"#open-music/**/*.js": "./src/**/*.js"
+	},
 	"scripts": {
 		"prepare": "husky install",
 		"fmt": "prettier --cache --write .",

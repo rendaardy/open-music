@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import pg from "pg";
 
-import { InvariantError, NotFoundError, AuthorizationError } from "../../../utils/error.js";
+import { InvariantError, NotFoundError, AuthorizationError } from "#open-music/utils/error.js";
 
 import "core-js/actual/array/group-to-map.js";
 

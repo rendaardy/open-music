@@ -1,6 +1,6 @@
 import type * as pg from "pg";
 
-export type { Song } from "../../../entities.ts";
+export type { Song } from "#open-music/entities.ts";
 
 export type Payload = Omit<Song, "id">;
 

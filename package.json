@@ -22,6 +22,9 @@
 	"keywords": [],
 	"author": "Marenda S.A. <renda_ardy@tutanota.com>",
 	"license": "MIT",
+	"engines": {
+		"node": ">=16 <=18"
+	},
 	"dependencies": {
 		"@hapi/hapi": "^20.2.2",
 		"@hapi/jwt": "^3.0.0",

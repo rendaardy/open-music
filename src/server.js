@@ -5,19 +5,19 @@ import pinoPlugin from "hapi-pino";
 import Jwt from "@hapi/jwt";
 import * as dotenv from "dotenv";
 
-import { albumsPlugin } from "./plugins/albums.js";
-import { songsPlugin } from "./plugins/songs.js";
-import { authPlugin } from "./plugins/authentications.js";
-import { usersPlugin } from "./plugins/users.js";
-import { playlistsPlugin } from "./plugins/playlists.js";
-import { collabPlugin } from "./plugins/collaborations.js";
+import { albumsPlugin } from "./plugins/api/albums.js";
+import { songsPlugin } from "./plugins/api/songs.js";
+import { authPlugin } from "./plugins/api/authentications.js";
+import { usersPlugin } from "./plugins/api/users.js";
+import { playlistsPlugin } from "./plugins/api/playlists.js";
+import { collabPlugin } from "./plugins/api/collaborations.js";
 
-import { albumsServicePlugin } from "./plugins/albums-service.js";
-import { songsServicePlugin } from "./plugins/songs-service.js";
-import { usersServicePlugin } from "./plugins/users-service.js";
-import { authServicePlugin } from "./plugins/authentications-service.js";
-import { playlistsServicePlugin } from "./plugins/playlists-service.js";
-import { collabServicePlugin } from "./plugins/collaborations-service.js";
+import { albumsServicePlugin } from "./plugins/services/albums-service.js";
+import { songsServicePlugin } from "./plugins/services/songs-service.js";
+import { usersServicePlugin } from "./plugins/services/users-service.js";
+import { authServicePlugin } from "./plugins/services/authentications-service.js";
+import { playlistsServicePlugin } from "./plugins/services/playlists-service.js";
+import { collabServicePlugin } from "./plugins/services/collaborations-service.js";
 
 import { ClientError } from "./utils/error.js";
 

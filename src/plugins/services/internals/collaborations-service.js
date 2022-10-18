@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import pg from "pg";
 
-import { InvariantError, AuthorizationError } from "../utils/error.js";
+import { InvariantError, AuthorizationError } from "../../../utils/error.js";
 
 const { Pool } = pg;
 

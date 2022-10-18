@@ -1,4 +1,4 @@
-import { UsersService } from "../services/users-service.js";
+import { UsersService } from "./internals/users-service.js";
 
 /** @type {import("@hapi/hapi").Plugin<undefined>} */
 export const usersServicePlugin = {

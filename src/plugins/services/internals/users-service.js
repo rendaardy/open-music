@@ -1,8 +1,8 @@
 import { randomUUID, randomBytes } from "node:crypto";
 import pg from "pg";
 
-import { createPasswordHash, compare } from "../utils/hash.js";
-import { NotFoundError, InvariantError, AuthenticationError } from "../utils/error.js";
+import { createPasswordHash, compare } from "../../../utils/hash.js";
+import { NotFoundError, InvariantError, AuthenticationError } from "../../../utils/error.js";
 
 const { Pool } = pg;
 

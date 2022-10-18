@@ -1,4 +1,4 @@
-import { AuthenticationsService } from "../services/authentications-service.js";
+import { AuthenticationsService } from "./internals/authentications-service.js";
 
 /** @type {import("@hapi/hapi").Plugin<undefined>} */
 export const authServicePlugin = {

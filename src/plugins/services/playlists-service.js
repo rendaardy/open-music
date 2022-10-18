@@ -1,4 +1,4 @@
-import { PlaylistsService } from "../services/playlists-service.js";
+import { PlaylistsService } from "./internals/playlists-service.js";
 
 /** @type {import("@hapi/hapi").Plugin<undefined>} */
 export const playlistsServicePlugin = {

@@ -4,8 +4,8 @@ import {
 	postAuthenticationHandler,
 	putAuthenticationHandler,
 	deleteAuthenticationHandler,
-} from "../handlers/authentications.js";
-import { InvariantError } from "../utils/error.js";
+} from "./handlers/authentications.js";
+import { InvariantError } from "../../utils/error.js";
 
 const userCredentialSchema = Joi.object({
 	username: Joi.string().trim().required(),

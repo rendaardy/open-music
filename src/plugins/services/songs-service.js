@@ -1,4 +1,4 @@
-import { SongsService } from "../services/songs-service.js";
+import { SongsService } from "./internals/songs-service.js";
 
 /** @type {import("@hapi/hapi").Plugin<undefined>} */
 export const songsServicePlugin = {

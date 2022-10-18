@@ -1,4 +1,4 @@
-import { CollaborationsService } from "../services/collaborations-service.js";
+import { CollaborationsService } from "./internals/collaborations-service.js";
 
 /** @type {import("@hapi/hapi").Plugin<undefined>} */
 export const collabServicePlugin = {

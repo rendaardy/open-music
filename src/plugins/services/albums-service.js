@@ -1,4 +1,4 @@
-import { AlbumsService } from "../services/albums-service.js";
+import { AlbumsService } from "./internals/albums-service.js";
 
 /** @type {import("@hapi/hapi").Plugin<undefined>} */
 export const albumsServicePlugin = {

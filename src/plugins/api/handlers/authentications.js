@@ -2,7 +2,7 @@ import {
 	generateAccessToken,
 	generateRefreshToken,
 	verifyRefreshToken,
-} from "../utils/token-manager.js";
+} from "../../../utils/token-manager.js";
 
 /**
  * @param {import("@hapi/hapi").Request} request

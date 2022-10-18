@@ -1,12 +1,12 @@
 import Joi from "joi";
 
-import { InvariantError } from "../utils/error.js";
+import { InvariantError } from "../../utils/error.js";
 import {
 	getAlbumHandler,
 	postAlbumHandler,
 	putAlbumHandler,
 	deleteAlbumHandler,
-} from "../handlers/albums.js";
+} from "./handlers/albums.js";
 
 const bodySchema = Joi.object({
 	name: Joi.string().trim().required(),

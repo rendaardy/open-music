@@ -1,13 +1,13 @@
 import Joi from "joi";
 
-import { InvariantError } from "../utils/error.js";
+import { InvariantError } from "../../utils/error.js";
 import {
 	getAllSongsHandler,
 	getSongHandler,
 	postSongHandler,
 	putSongHandler,
 	deleteSongHandler,
-} from "../handlers/songs.js";
+} from "./handlers/songs.js";
 
 const bodySchema = Joi.object({
 	title: Joi.string().trim().required(),

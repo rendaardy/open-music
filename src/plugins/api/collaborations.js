@@ -3,8 +3,8 @@ import Joi from "joi";
 import {
 	postCollaborationsHandler,
 	deleteCollaborationsHandler,
-} from "../handlers/collaborations.js";
-import { InvariantError } from "../utils/error.js";
+} from "./handlers/collaborations.js";
+import { InvariantError } from "../../utils/error.js";
 
 const bodySchema = Joi.object({
 	playlistId: Joi.string().trim().required(),

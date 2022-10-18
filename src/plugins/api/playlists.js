@@ -8,8 +8,8 @@ import {
 	getSongsInPlaylistHandler,
 	deleteSongFromPlaylistByIdHandler,
 	getPlaylistActivitiesHandler,
-} from "../handlers/playlists.js";
-import { InvariantError, NotFoundError } from "../utils/error.js";
+} from "./handlers/playlists.js";
+import { InvariantError, NotFoundError } from "../../utils/error.js";
 
 const playlistBodySchema = Joi.object({
 	name: Joi.string().trim().required(),

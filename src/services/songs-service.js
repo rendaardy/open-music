@@ -38,7 +38,7 @@ export class SongsService {
 		const sqlQuery = {
 			text: `
         SELECT 
-          id, title, year, performer, genre, duration, albumId 
+          id, title, year, performer, genre, duration, album_id 
         FROM 
           songs 
         WHERE 
@@ -60,7 +60,7 @@ export class SongsService {
 		const result = await this.#db.query({
 			text: `
         SELECT 
-          id, title, year, performer, genre, duration, albumId 
+          id, title, year, performer, genre, duration, album_id 
         FROM 
           songs 
         WHERE 

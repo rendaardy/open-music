@@ -3,7 +3,6 @@ import process from "node:process";
 import { server as hapiServer } from "@hapi/hapi";
 import pinoPlugin from "hapi-pino";
 import Jwt from "@hapi/jwt";
-import * as dotenv from "dotenv";
 
 import { albumsPlugin } from "./plugins/api/albums.js";
 import { songsPlugin } from "./plugins/api/songs.js";
@@ -19,13 +18,12 @@ import { authServicePlugin } from "./plugins/services/authentications-service.js
 import { playlistsServicePlugin } from "./plugins/services/playlists-service.js";
 import { collabServicePlugin } from "./plugins/services/collaborations-service.js";
 
-import { ClientError } from "#open-music/utils/error.js";
-
-dotenv.config();
+import { ClientError } from "./utils/error.js";
+import { cfg } from "./utils/config.js";
 
 const server = hapiServer({
-	host: process.env.NODE_ENV === "production" ? process.env.HOST : "localhost",
-	port: process.env.PORT ?? 5000,
+	host: cfg.app.environment === "production" ? cfg.app.host : "localhost",
+	port: cfg.app.port ?? 5000,
 	debug: false,
 });
 
@@ -37,7 +35,7 @@ export async function initializeServer() {
 		plugin: pinoPlugin,
 		options: {
 			redact: ["req.headers.authorization"],
-			logPayload: process.env.NODE_ENV !== "production",
+			logPayload: cfg.app.environment !== "production",
 			logQueryParams: true,
 			logPathParams: true,
 			logRouteTags: true,
@@ -46,12 +44,12 @@ export async function initializeServer() {
 	await server.register([Jwt]);
 
 	server.auth.strategy("open-music_jwt", "jwt", {
-		keys: process.env.ACCESS_TOKEN_KEY,
+		keys: cfg.jwt.accessTokenKey,
 		verify: {
 			aud: false,
 			iss: false,
 			sub: false,
-			maxAgeSec: process.env.ACCESS_TOKEN_AGE,
+			maxAgeSec: cfg.jwt.tokenAge,
 		},
 		validate(artifacts, _request, _h) {
 			return {
@@ -99,7 +97,7 @@ export async function initializeServer() {
 				.response({
 					status: "error",
 					message:
-						process.env.NODE_ENV === "production"
+						cfg.app.environment === "production"
 							? "An internal server error occurred"
 							: response.message,
 				})

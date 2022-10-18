@@ -1,7 +1,7 @@
-import process from "node:process";
 import Jwt from "@hapi/jwt";
 
 import { InvariantError } from "./error.js";
+import { cfg } from "./config.js";
 
 /**
  * @param {any} payload
@@ -9,13 +9,11 @@ import { InvariantError } from "./error.js";
  * @throws {Error}
  */
 export function generateAccessToken(payload) {
-	const { ACCESS_TOKEN_KEY } = process.env;
-
-	if (!ACCESS_TOKEN_KEY) {
+	if (!cfg.jwt.accessTokenKey) {
 		throw new Error("ACCESS_TOKEN_KEY must be defined");
 	}
 
-	return Jwt.token.generate(payload, ACCESS_TOKEN_KEY);
+	return Jwt.token.generate(payload, cfg.jwt.accessTokenKey);
 }
 
 /**
@@ -24,13 +22,11 @@ export function generateAccessToken(payload) {
  * @throws {Error}
  */
 export function generateRefreshToken(payload) {
-	const { REFRESH_TOKEN_KEY } = process.env;
-
-	if (!REFRESH_TOKEN_KEY) {
+	if (!cfg.jwt.refreshTokenKey) {
 		throw new Error("REFRESH_TOKEN_KEY must be defined");
 	}
 
-	return Jwt.token.generate(payload, REFRESH_TOKEN_KEY);
+	return Jwt.token.generate(payload, cfg.jwt.refreshTokenKey);
 }
 
 /**
@@ -42,13 +38,12 @@ export function generateRefreshToken(payload) {
 export function verifyRefreshToken(refreshToken) {
 	try {
 		const artifacts = Jwt.token.decode(refreshToken);
-		const { REFRESH_TOKEN_KEY } = process.env;
 
-		if (!REFRESH_TOKEN_KEY) {
+		if (!cfg.jwt.refreshTokenKey) {
 			throw new Error("REFRESH_TOKEN_KEY must be defined");
 		}
 
-		Jwt.token.verifySignature(artifacts, REFRESH_TOKEN_KEY);
+		Jwt.token.verifySignature(artifacts, cfg.jwt.refreshTokenKey);
 
 		const { payload } = artifacts.decoded;
 

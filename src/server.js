@@ -10,6 +10,7 @@ import { authPlugin } from "./plugins/api/authentications.js";
 import { usersPlugin } from "./plugins/api/users.js";
 import { playlistsPlugin } from "./plugins/api/playlists.js";
 import { collabPlugin } from "./plugins/api/collaborations.js";
+import { exportsPlugin } from "./plugins/api/exports.js";
 
 import { albumsServicePlugin } from "./plugins/services/albums-service.js";
 import { songsServicePlugin } from "./plugins/services/songs-service.js";
@@ -17,6 +18,7 @@ import { usersServicePlugin } from "./plugins/services/users-service.js";
 import { authServicePlugin } from "./plugins/services/authentications-service.js";
 import { playlistsServicePlugin } from "./plugins/services/playlists-service.js";
 import { collabServicePlugin } from "./plugins/services/collaborations-service.js";
+import { messageServicePlugin } from "./plugins/services/message-service.js";
 
 import { ClientError } from "./utils/error.js";
 import { cfg } from "./utils/config.js";
@@ -68,12 +70,14 @@ export async function initializeServer() {
 		authPlugin,
 		playlistsPlugin,
 		collabPlugin,
+		exportsPlugin,
 		albumsServicePlugin,
 		songsServicePlugin,
 		usersServicePlugin,
 		authServicePlugin,
 		playlistsServicePlugin,
 		collabServicePlugin,
+		messageServicePlugin,
 	]);
 
 	server.ext("onPreResponse", (request, h) => {

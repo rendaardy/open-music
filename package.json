@@ -27,7 +27,7 @@
 	"author": "Marenda S.A. <renda_ardy@tutanota.com>",
 	"license": "MIT",
 	"engines": {
-		"node": ">=16 <=18"
+		"node": ">=16.10.0 <=18"
 	},
 	"dependencies": {
 		"@aws-sdk/client-s3": "^3.190.0",

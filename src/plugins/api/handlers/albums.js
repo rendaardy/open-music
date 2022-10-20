@@ -72,3 +72,27 @@ export async function deleteAlbumHandler(request, _h) {
 		message: "Album deleted successfully",
 	};
 }
+
+/**
+ * @param {import("@hapi/hapi").Request} request
+ * @param {import("@hapi/hapi").ResponseToolkit} h
+ * @return {Promise<import("@hapi/hapi").Lifecycle.ReturnValue>}
+ */
+export async function postUploadAlbumCoverHandler(request, h) {
+	const { id } = request.params;
+	const { cover } = /** @type {{ cover: import("node:stream").Readable }} */ (request.payload);
+	const metadata = /** @type {any} */ (cover).hapi;
+	const { validateHeaders, uploadAlbumCover, updateAlbumCover } = request.server.methods;
+
+	validateHeaders(metadata.headers);
+
+	const coverUrl = await uploadAlbumCover(cover, metadata);
+	await updateAlbumCover(id, coverUrl);
+
+	return h
+		.response({
+			status: "success",
+			message: "Album cover uploaded",
+		})
+		.code(201);
+}

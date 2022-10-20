@@ -6,7 +6,8 @@
 	"private": true,
 	"type": "module",
 	"imports": {
-		"#open-music/**/*.js": "./src/**/*.js"
+		"#open-music/*.js": "./src/*.js",
+		"#open-music/utils/*.js": "./src/utils/*.js"
 	},
 	"scripts": {
 		"prepare": "husky install",
@@ -29,6 +30,7 @@
 		"node": ">=16 <=18"
 	},
 	"dependencies": {
+		"@aws-sdk/client-s3": "^3.190.0",
 		"@hapi/hapi": "^20.2.2",
 		"@hapi/jwt": "^3.0.0",
 		"amqplib": "^0.10.3",

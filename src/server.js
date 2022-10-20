@@ -19,6 +19,7 @@ import { authServicePlugin } from "./plugins/services/authentications-service.js
 import { playlistsServicePlugin } from "./plugins/services/playlists-service.js";
 import { collabServicePlugin } from "./plugins/services/collaborations-service.js";
 import { messageServicePlugin } from "./plugins/services/message-service.js";
+import { s3Plugin } from "./plugins/services/aws-s3-service.js";
 
 import { ClientError } from "./utils/error.js";
 import { cfg } from "./utils/config.js";
@@ -79,12 +80,21 @@ export async function initializeServer() {
 		collabServicePlugin,
 		messageServicePlugin,
 	]);
+	await server.register({
+		plugin: s3Plugin,
+		options: {
+			region: cfg.aws.region ?? "",
+			bucketName: cfg.aws.s3.bucketName ?? "",
+		},
+	});
 
 	server.ext("onPreResponse", (request, h) => {
 		const { response } = request;
 
 		if (response instanceof Error) {
 			if (response instanceof ClientError) {
+				request.logger.error("Client Error: %s", response.message);
+
 				return h
 					.response({
 						status: "fail",
@@ -96,6 +106,8 @@ export async function initializeServer() {
 			if (!response.isServer) {
 				return h.continue;
 			}
+
+			request.logger.error("Server Error: %s", response.message);
 
 			return h
 				.response({

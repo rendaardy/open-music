@@ -17,6 +17,8 @@ export declare class AlbumsService {
 
 	async updateAlbum(id: string, payload: Payload): Promise<void>;
 
+	async updateAlbumCover(id: string, coverUrl: string): Promise<void>;
+
 	async deleteAlbum(id: string): Promise<void>;
 
 	async close(): Promise<void>;

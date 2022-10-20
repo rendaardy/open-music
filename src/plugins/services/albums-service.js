@@ -11,6 +11,7 @@ export const albumsServicePlugin = {
 		server.method("getAlbums", service.getAlbums);
 		server.method("getAlbum", service.getAlbum);
 		server.method("updateAlbum", service.updateAlbum);
+		server.method("updateAlbumCover", service.updateAlbumCover);
 		server.method("deleteAlbum", service.deleteAlbum);
 
 		server.ext("onPostStop", async () => {

@@ -6,6 +6,7 @@ import {
 	postAlbumHandler,
 	putAlbumHandler,
 	deleteAlbumHandler,
+	postUploadAlbumCoverHandler,
 } from "./handlers/albums.js";
 
 const bodySchema = Joi.object({
@@ -23,6 +24,7 @@ const responseSchema = Joi.object({
 					album: Joi.object({
 						id: Joi.string().required(),
 						name: Joi.string().required(),
+						coverUrl: Joi.string().allow(null),
 						year: Joi.number().integer().required(),
 						songs: Joi.array()
 							.items(
@@ -50,8 +52,21 @@ const postAlbumResponseSchema = responseSchema.tailor("post");
 /** @type {import("@hapi/hapi").Plugin<undefined>} */
 export const albumsPlugin = {
 	name: "app/albums",
-	dependencies: ["app/albums-service"],
+	dependencies: ["app/albums-service", "app/aws-s3-service"],
 	async register(server) {
+		server.method("validateHeaders", (headers) => {
+			const HeadersSchema = Joi.object({
+				"content-type": Joi.string()
+					.valid("image/apng", "image/avif", "image/gif", "image/jpeg", "image/png", "image/webp")
+					.required(),
+			}).unknown();
+			const result = HeadersSchema.validate(headers);
+
+			if (result.error) {
+				throw new InvariantError(result.error.message);
+			}
+		});
+
 		server.route([
 			{
 				method: "GET",
@@ -118,6 +133,32 @@ export const albumsPlugin = {
 						async failAction(request, h, err) {
 							throw new InvariantError(/** @type {any} */ (err)?.details[0].message);
 						},
+					},
+					response: {
+						schema: responseSchema,
+					},
+				},
+			},
+			{
+				method: "POST",
+				path: "/albums/{id}/covers",
+				handler: postUploadAlbumCoverHandler,
+				options: {
+					validate: {
+						params: Joi.object({
+							id: Joi.string().required(),
+						}),
+						async failAction(request, h, err) {
+							console.log(err);
+							throw new InvariantError(/** @type {any} */ (err)?.details[0]?.message);
+						},
+					},
+					payload: {
+						allow: "multipart/form-data",
+						maxBytes: 512000,
+						// @ts-ignore
+						multipart: true,
+						output: "stream",
 					},
 					response: {
 						schema: responseSchema,

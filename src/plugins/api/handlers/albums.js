@@ -96,3 +96,42 @@ export async function postUploadAlbumCoverHandler(request, h) {
 		})
 		.code(201);
 }
+
+/**
+ * @param {import("@hapi/hapi").Request} request
+ * @param {import("@hapi/hapi").ResponseToolkit} _h
+ * @return {Promise<import("@hapi/hapi").Lifecycle.ReturnValue>}
+ */
+export async function getAlbumLikesHandler(request, _h) {
+	const { id } = request.params;
+	const { getAlbumLikes } = request.server.methods;
+
+	const likes = await getAlbumLikes(id);
+
+	return {
+		status: "success",
+		data: {
+			likes,
+		},
+	};
+}
+
+/**
+ * @param {import("@hapi/hapi").Request} request
+ * @param {import("@hapi/hapi").ResponseToolkit} h
+ * @return {Promise<import("@hapi/hapi").Lifecycle.ReturnValue>}
+ */
+export async function postAlbumLikesHandler(request, h) {
+	const { id: albumId } = request.params;
+	const { userId } = request.auth.credentials;
+	const { updateAlbumLikes } = request.server.methods;
+
+	const liked = await updateAlbumLikes(albumId, userId);
+
+	return h
+		.response({
+			status: "success",
+			message: `You ${liked === 1 ? "like" : "dislike"} this album`,
+		})
+		.code(201);
+}

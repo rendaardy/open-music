@@ -38,7 +38,6 @@ export async function initializeServer() {
 		plugin: pinoPlugin,
 		options: {
 			redact: ["req.headers.authorization"],
-			logPayload: cfg.app.environment !== "production",
 			logQueryParams: true,
 			logPathParams: true,
 			logRouteTags: true,

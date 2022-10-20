@@ -7,6 +7,8 @@ import {
 	putAlbumHandler,
 	deleteAlbumHandler,
 	postUploadAlbumCoverHandler,
+	getAlbumLikesHandler,
+	postAlbumLikesHandler,
 } from "./handlers/albums.js";
 
 const bodySchema = Joi.object({
@@ -41,6 +43,10 @@ const responseSchema = Joi.object({
 			post: (schema) =>
 				schema.append({
 					albumId: Joi.string().required(),
+				}),
+			likes: (schema) =>
+				schema.append({
+					likes: Joi.number().integer().positive().required(),
 				}),
 		})
 		.optional(),
@@ -159,6 +165,43 @@ export const albumsPlugin = {
 						// @ts-ignore
 						multipart: true,
 						output: "stream",
+					},
+					response: {
+						schema: responseSchema,
+					},
+				},
+			},
+			{
+				method: "GET",
+				path: "/albums/{id}/likes",
+				handler: getAlbumLikesHandler,
+				options: {
+					validate: {
+						params: Joi.object({
+							id: Joi.string().required(),
+						}),
+						async failAction(request, h, err) {
+							throw new InvariantError(/** @type {any} */ (err)?.details[0]?.message);
+						},
+					},
+					response: {
+						schema: responseSchema.tailor("likes"),
+					},
+				},
+			},
+			{
+				method: "POST",
+				path: "/albums/{id}/likes",
+				handler: postAlbumLikesHandler,
+				options: {
+					auth: "open-music_jwt",
+					validate: {
+						params: Joi.object({
+							id: Joi.string().required(),
+						}),
+						async failAction(request, h, err) {
+							throw new InvariantError(/** @type {any} */ (err)?.details[0]?.message);
+						},
 					},
 					response: {
 						schema: responseSchema,

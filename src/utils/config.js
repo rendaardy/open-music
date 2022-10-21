@@ -21,12 +21,6 @@ export const cfg = {
 			bucketName: env.AWS_BUCKET_NAME,
 		},
 	},
-	mail: {
-		host: env.MAIL_HOST,
-		port: env.MAIL_PORT,
-		address: env.MAIL_ADDRESS,
-		password: env.MAIL_PASSWORD,
-	},
 	rabbitMq: {
 		server: env.RABBITMQ_SERVER,
 	},

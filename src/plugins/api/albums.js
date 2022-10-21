@@ -58,7 +58,7 @@ const postAlbumResponseSchema = responseSchema.tailor("post");
 /** @type {import("@hapi/hapi").Plugin<undefined>} */
 export const albumsPlugin = {
 	name: "app/albums",
-	dependencies: ["app/albums-service", "app/aws-s3-service"],
+	dependencies: ["app/albums-service", "app/aws-s3-service", "app/redis-service"],
 	async register(server) {
 		server.method("validateHeaders", (headers) => {
 			const HeadersSchema = Joi.object({

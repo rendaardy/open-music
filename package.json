@@ -38,7 +38,8 @@
 		"dotenv": "^16.0.2",
 		"hapi-pino": "^11.0.0",
 		"joi": "^17.6.0",
-		"pg": "^8.8.0"
+		"pg": "^8.8.0",
+		"redis": "^4.3.1"
 	},
 	"devDependencies": {
 		"@types/amqplib": "^0.8.2",

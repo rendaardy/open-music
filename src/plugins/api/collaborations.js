@@ -27,7 +27,12 @@ const responseSchema = Joi.object({
 /** @type {import("@hapi/hapi").Plugin<undefined>} */
 export const collabPlugin = {
 	name: "app/collaborations",
-	dependencies: ["app/collaborations-service", "app/playlists-service", "app/users-service"],
+	dependencies: [
+		"app/collaborations-service",
+		"app/playlists-service",
+		"app/users-service",
+		"app/redis-service",
+	],
 	async register(server) {
 		server.method("isUserAvailable", async (userId) => {
 			await server.methods.getUserById(userId);

@@ -20,6 +20,7 @@ import { playlistsServicePlugin } from "./plugins/services/playlists-service.js"
 import { collabServicePlugin } from "./plugins/services/collaborations-service.js";
 import { messageServicePlugin } from "./plugins/services/message-service.js";
 import { s3Plugin } from "./plugins/services/aws-s3-service.js";
+import { redisPlugin } from "./plugins/services/redis-service.js";
 
 import { ClientError } from "./utils/error.js";
 import { cfg } from "./utils/config.js";
@@ -79,13 +80,21 @@ export async function initializeServer() {
 		collabServicePlugin,
 		messageServicePlugin,
 	]);
-	await server.register({
-		plugin: s3Plugin,
-		options: {
-			region: cfg.aws.region ?? "",
-			bucketName: cfg.aws.s3.bucketName ?? "",
+	await server.register([
+		{
+			plugin: s3Plugin,
+			options: {
+				region: cfg.aws.region ?? "",
+				bucketName: cfg.aws.s3.bucketName ?? "",
+			},
 		},
-	});
+		{
+			plugin: redisPlugin,
+			options: {
+				host: cfg.redis.server ?? "",
+			},
+		},
+	]);
 
 	server.ext("onPreResponse", (request, h) => {
 		const { response } = request;

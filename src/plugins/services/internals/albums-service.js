@@ -25,6 +25,7 @@ export class AlbumsService {
         SELECT
           albums.id AS album_id,
           albums.name,
+          albums.cover_url,
           albums.year,
           songs.id AS song_id,
           songs.title,
@@ -45,6 +46,7 @@ export class AlbumsService {
 			groupAlbums.push({
 				id: album.album_id,
 				name: album.name,
+				coverUrl: album.cover_url,
 				year: album.year,
 				songs: songs.map((song) => ({
 					id: song.song_id,
@@ -69,6 +71,7 @@ export class AlbumsService {
           albums.id AS album_id,
           albums.name,
           albums.year,
+          albums.cover_url,
           songs.id AS song_id,
           songs.title,
           songs.performer
@@ -96,6 +99,7 @@ export class AlbumsService {
 			album = {
 				id: songsAlbum.album_id,
 				name: songsAlbum.name,
+				coverUrl: songsAlbum.cover_url,
 				year: songsAlbum.year,
 				songs: songs.map((song) => ({
 					id: song.song_id,
@@ -109,6 +113,53 @@ export class AlbumsService {
 	}
 
 	/**
+	 * @param {string} albumId
+	 * @return {Promise<number>}
+	 */
+	async getAlbumLikes(albumId) {
+		const client = await this.#db.connect();
+
+		try {
+			await client.query("BEGIN");
+
+			let result = await client.query({
+				text: "SELECT id FROM albums WHERE id = $1",
+				values: [albumId],
+			});
+
+			if (result.rowCount <= 0) {
+				throw new NotFoundError("Album not found");
+			}
+
+			result = await client.query({
+				text: `
+          SELECT
+            album_id,
+            COUNT(album_id) AS likes
+          FROM
+            user_album_likes
+          WHERE
+            album_id = $1
+          GROUP BY
+            album_id
+        `,
+				values: [albumId],
+			});
+
+			const { likes } = result.rows[0];
+
+			await client.query("COMMIT");
+
+			return Number.parseInt(likes ?? "0", 10);
+		} catch (error) {
+			await client.query("ROLLBACK");
+			throw error;
+		} finally {
+			client.release();
+		}
+	}
+
+	/**
 	 * @param {import("./albums-service.js").Payload} payload
 	 * @return {Promise<string>}
 	 */
@@ -119,6 +170,65 @@ export class AlbumsService {
 		});
 
 		return result.rows[0].id;
+	}
+
+	/**
+	 * @param {string} albumId
+	 * @param {string} userId
+	 * @return {Promise<number>}
+	 */
+	async updateAlbumLikes(albumId, userId) {
+		const client = await this.#db.connect();
+
+		try {
+			await client.query("BEGIN");
+
+			let result = await client.query({
+				text: "SELECT id FROM albums WHERE id = $1",
+				values: [albumId],
+			});
+
+			if (result.rowCount <= 0) {
+				throw new NotFoundError("Album not found");
+			}
+
+			result = await client.query({
+				text: `
+          SELECT
+            user_id,
+            album_id
+          FROM
+            user_album_likes
+          WHERE
+            user_id = $1 AND album_id = $2
+        `,
+				values: [userId, albumId],
+			});
+
+			let likeQuery;
+			if (result.rowCount <= 0) {
+				likeQuery = {
+					text: "INSERT INTO user_album_likes(id, user_id, album_id) VALUES ($1, $2, $3) RETURNING 1 AS liked",
+					values: [`likes-${randomUUID()}`, userId, albumId],
+				};
+			} else {
+				likeQuery = {
+					text: "DELETE FROM user_album_likes WHERE user_id = $1 AND album_id = $2 RETURNING 0 AS liked",
+					values: [userId, albumId],
+				};
+			}
+
+			result = await client.query(likeQuery);
+
+			await client.query("COMMIT");
+
+			return result.rows[0].liked;
+		} catch (error) {
+			await client.query("ROLLBACK");
+			throw error;
+		} finally {
+			client.release();
+		}
 	}
 
 	/**
@@ -138,6 +248,26 @@ export class AlbumsService {
 		}
 
 		return result.rowCount;
+	}
+
+	/**
+	 * @param {string} id
+	 * @param {string} coverUrl
+	 */
+	async updateAlbumCover(id, coverUrl) {
+		const result = await this.#db.query({
+			text: "SELECT cover_url FROM albums WHERE id = $1",
+			values: [id],
+		});
+
+		if (result.rowCount <= 0) {
+			throw new NotFoundError("Album not found");
+		}
+
+		await this.#db.query({
+			text: "UPDATE albums SET cover_url = $1 WHERE id = $2",
+			values: [coverUrl, id],
+		});
 	}
 
 	/**

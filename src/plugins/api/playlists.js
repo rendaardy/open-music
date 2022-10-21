@@ -76,7 +76,12 @@ const responseSchema = Joi.object({
 /** @type {import("@hapi/hapi").Plugin<undefined>} */
 export const playlistsPlugin = {
 	name: "app/playlists",
-	dependencies: ["app/playlists-service", "app/collaborations-service", "app/songs-service"],
+	dependencies: [
+		"app/playlists-service",
+		"app/collaborations-service",
+		"app/songs-service",
+		"app/redis-service",
+	],
 	async register(server) {
 		server.method("verifyPlaylistAccess", async (playlistId, owner) => {
 			try {

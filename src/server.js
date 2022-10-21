@@ -3,7 +3,6 @@ import process from "node:process";
 import { server as hapiServer } from "@hapi/hapi";
 import pinoPlugin from "hapi-pino";
 import Jwt from "@hapi/jwt";
-import * as dotenv from "dotenv";
 
 import { albumsPlugin } from "./plugins/api/albums.js";
 import { songsPlugin } from "./plugins/api/songs.js";
@@ -11,6 +10,7 @@ import { authPlugin } from "./plugins/api/authentications.js";
 import { usersPlugin } from "./plugins/api/users.js";
 import { playlistsPlugin } from "./plugins/api/playlists.js";
 import { collabPlugin } from "./plugins/api/collaborations.js";
+import { exportsPlugin } from "./plugins/api/exports.js";
 
 import { albumsServicePlugin } from "./plugins/services/albums-service.js";
 import { songsServicePlugin } from "./plugins/services/songs-service.js";
@@ -18,14 +18,16 @@ import { usersServicePlugin } from "./plugins/services/users-service.js";
 import { authServicePlugin } from "./plugins/services/authentications-service.js";
 import { playlistsServicePlugin } from "./plugins/services/playlists-service.js";
 import { collabServicePlugin } from "./plugins/services/collaborations-service.js";
+import { messageServicePlugin } from "./plugins/services/message-service.js";
+import { s3Plugin } from "./plugins/services/aws-s3-service.js";
+import { redisPlugin } from "./plugins/services/redis-service.js";
 
-import { ClientError } from "#open-music/utils/error.js";
-
-dotenv.config();
+import { ClientError } from "./utils/error.js";
+import { cfg } from "./utils/config.js";
 
 const server = hapiServer({
-	host: process.env.NODE_ENV === "production" ? process.env.HOST : "localhost",
-	port: process.env.PORT ?? 5000,
+	host: cfg.app.environment === "production" ? cfg.app.host : "localhost",
+	port: cfg.app.port ?? 5000,
 	debug: false,
 });
 
@@ -37,7 +39,6 @@ export async function initializeServer() {
 		plugin: pinoPlugin,
 		options: {
 			redact: ["req.headers.authorization"],
-			logPayload: process.env.NODE_ENV !== "production",
 			logQueryParams: true,
 			logPathParams: true,
 			logRouteTags: true,
@@ -46,12 +47,12 @@ export async function initializeServer() {
 	await server.register([Jwt]);
 
 	server.auth.strategy("open-music_jwt", "jwt", {
-		keys: process.env.ACCESS_TOKEN_KEY,
+		keys: cfg.jwt.accessTokenKey,
 		verify: {
 			aud: false,
 			iss: false,
 			sub: false,
-			maxAgeSec: process.env.ACCESS_TOKEN_AGE,
+			maxAgeSec: cfg.jwt.tokenAge,
 		},
 		validate(artifacts, _request, _h) {
 			return {
@@ -70,12 +71,29 @@ export async function initializeServer() {
 		authPlugin,
 		playlistsPlugin,
 		collabPlugin,
+		exportsPlugin,
 		albumsServicePlugin,
 		songsServicePlugin,
 		usersServicePlugin,
 		authServicePlugin,
 		playlistsServicePlugin,
 		collabServicePlugin,
+		messageServicePlugin,
+	]);
+	await server.register([
+		{
+			plugin: s3Plugin,
+			options: {
+				region: cfg.aws.region ?? "",
+				bucketName: cfg.aws.s3.bucketName ?? "",
+			},
+		},
+		{
+			plugin: redisPlugin,
+			options: {
+				host: cfg.redis.server ?? "",
+			},
+		},
 	]);
 
 	server.ext("onPreResponse", (request, h) => {
@@ -83,6 +101,8 @@ export async function initializeServer() {
 
 		if (response instanceof Error) {
 			if (response instanceof ClientError) {
+				request.logger.error("Client Error: %s", response.message);
+
 				return h
 					.response({
 						status: "fail",
@@ -95,11 +115,13 @@ export async function initializeServer() {
 				return h.continue;
 			}
 
+			request.logger.error("Server Error: %s", response.message);
+
 			return h
 				.response({
 					status: "error",
 					message:
-						process.env.NODE_ENV === "production"
+						cfg.app.environment === "production"
 							? "An internal server error occurred"
 							: response.message,
 				})

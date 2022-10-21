@@ -6,9 +6,10 @@
 export async function postPlaylistHandler(request, h) {
 	const { name } = /** @type {{ name: string }} */ (request.payload);
 	const { userId: owner } = /** @type {{ userId: string }} */ (request.auth.credentials);
-	const { addPlaylist } = request.server.methods;
+	const { addPlaylist, deleteCache } = request.server.methods;
 
 	const playlistId = await addPlaylist(name, owner);
+	await deleteCache(`open-music:playlists:${owner}`);
 
 	return h
 		.response({
@@ -22,13 +23,29 @@ export async function postPlaylistHandler(request, h) {
 
 /**
  * @param {import("@hapi/hapi").Request} request
- * @param {import("@hapi/hapi").ResponseToolkit} _h
+ * @param {import("@hapi/hapi").ResponseToolkit} h
  * @return {Promise<import("@hapi/hapi").Lifecycle.ReturnValue>}
  */
-export async function getPlaylistsHandler(request, _h) {
+export async function getPlaylistsHandler(request, h) {
 	const { userId: owner } = /** @type {{ userId: string }} */ (request.auth.credentials);
-	const { getPlaylists } = request.server.methods;
-	const playlists = await getPlaylists(owner);
+	const { getPlaylists, getCache, setCache } = request.server.methods;
+
+	let playlists = await getCache(`open-music:playlists:${owner}`);
+
+	if (playlists !== null) {
+		return h
+			.response({
+				status: "success",
+				data: {
+					playlists: JSON.parse(playlists),
+				},
+			})
+			.code(200)
+			.header("X-Data-Source", "cache");
+	}
+
+	playlists = await getPlaylists(owner);
+	await setCache(`open-music:playlists:${owner}`, JSON.stringify(playlists));
 
 	return {
 		status: "success",
@@ -46,10 +63,11 @@ export async function getPlaylistsHandler(request, _h) {
 export async function deletePlaylistByIdHandler(request, _h) {
 	const { id } = request.params;
 	const { userId: owner } = /** @type {{ userId: string }} */ (request.auth.credentials);
-	const { verifyPlaylistOwner, deletePlaylistById } = request.server.methods;
+	const { verifyPlaylistOwner, deletePlaylistById, deleteCache } = request.server.methods;
 
 	await verifyPlaylistOwner(id, owner);
 	await deletePlaylistById(id);
+	await deleteCache(`open-music:playlists:${owner}`);
 
 	return {
 		status: "success",

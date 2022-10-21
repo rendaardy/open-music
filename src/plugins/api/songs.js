@@ -60,7 +60,7 @@ const postSongResponseSchema = responseSchema.tailor("postSong");
 /** @type {import("@hapi/hapi").Plugin<undefined>} */
 export const songsPlugin = {
 	name: "app/songs",
-	dependencies: ["app/songs-service"],
+	dependencies: ["app/songs-service", "app/redis-service"],
 	async register(server) {
 		server.route([
 			{

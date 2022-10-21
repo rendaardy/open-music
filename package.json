@@ -6,7 +6,8 @@
 	"private": true,
 	"type": "module",
 	"imports": {
-		"#open-music/**/*.js": "./src/**/*.js"
+		"#open-music/*.js": "./src/*.js",
+		"#open-music/utils/*.js": "./src/utils/*.js"
 	},
 	"scripts": {
 		"prepare": "husky install",
@@ -26,18 +27,22 @@
 	"author": "Marenda S.A. <renda_ardy@tutanota.com>",
 	"license": "MIT",
 	"engines": {
-		"node": ">=16 <=18"
+		"node": ">=16.10.0 <=18"
 	},
 	"dependencies": {
+		"@aws-sdk/client-s3": "^3.190.0",
 		"@hapi/hapi": "^20.2.2",
 		"@hapi/jwt": "^3.0.0",
+		"amqplib": "^0.10.3",
 		"core-js": "^3.25.2",
 		"dotenv": "^16.0.2",
 		"hapi-pino": "^11.0.0",
 		"joi": "^17.6.0",
-		"pg": "^8.8.0"
+		"pg": "^8.8.0",
+		"redis": "^4.3.1"
 	},
 	"devDependencies": {
+		"@types/amqplib": "^0.8.2",
 		"@types/core-js": "^2.5.5",
 		"@types/hapi__hapi": "^20.0.12",
 		"@types/hapi__jwt": "^2.0.1",

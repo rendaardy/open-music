@@ -13,9 +13,15 @@ export declare class AlbumsService {
 
 	async getAlbum(id: string): Promise<Album>;
 
+	async getAlbumLikes(albumId: string): Promise<number>;
+
 	async addAlbum(payload: Payload): Promise<string>;
 
+	async updateAlbumLikes(albumId: string, userId: string): Promise<number>;
+
 	async updateAlbum(id: string, payload: Payload): Promise<void>;
+
+	async updateAlbumCover(id: string, coverUrl: string): Promise<void>;
 
 	async deleteAlbum(id: string): Promise<void>;
 

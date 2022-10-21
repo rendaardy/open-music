@@ -1,6 +1,8 @@
 export type Album = {
 	id: string;
 	name: string;
+	// eslint-disable-next-line @typescript-eslint/ban-types
+	coverUrl: string | null;
 	year: number;
 	songs?: Array<Pick<Song, "id" | "title" | "performer">>;
 };

@@ -1,0 +1,24 @@
+{
+  "$schema": "https://turborepo.org/schema.json",
+  "pipeline": {
+    "lint": {
+      "inputs": ["**/*.js", "**/*.cjs", "**/*.ts"],
+      "outputs": [".eslintcache"]
+    },
+    "fmt": {
+      "inputs": ["**/*.js", "**/*.cjs", "**/*.ts", "**/*.json"],
+      "outputs": []
+    },
+    "check": {
+      "outputs": ["tsconfig.tsbuildinfo"]
+    },
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**"]
+    },
+    "test": {
+      "inputs": ["src/**/*.js", "src/**/*.ts", "tests/**/*.js", "tests/**/*.ts"],
+      "outputs": []
+    }
+  }
+}

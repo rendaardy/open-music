@@ -1,66 +1,16 @@
 {
 	"name": "open-music",
-	"version": "1.0.0",
-	"description": "Music sharing app",
-	"main": "src/index.js",
-	"private": true,
-	"type": "module",
-	"imports": {
-		"#open-music/*.js": "./src/*.js",
-		"#open-music/utils/*.js": "./src/utils/*.js"
-	},
-	"scripts": {
-		"prepare": "husky install",
-		"fmt": "prettier --cache --write .",
-		"lint": "eslint --cache --ext js,cjs,mjs,ts,cts,mts .",
-		"check": "tsc",
-		"start": "NODE_ENV=production node src/index.js",
-		"start:dev": "tsx watch --clear-screen=false src/index.js | pino-pretty",
-		"migrate": "node-pg-migrate",
-		"test": "vitest --threads=false"
-	},
-	"lint-staged": {
-		"*.{js,cjs,mjs,ts,cts,mts,json}": "pnpm fmt",
-		"*.{js,cjs,mjs,ts,cts,mts}": "pnpm lint"
-	},
-	"keywords": [],
+	"version": "0.3.0",
+	"description": "Open Music API",
+	"scripts": {},
 	"author": "Marenda S.A. <renda_ardy@tutanota.com>",
 	"license": "MIT",
 	"engines": {
 		"node": ">=16.10.0 <=18"
 	},
-	"dependencies": {
-		"@aws-sdk/client-s3": "^3.190.0",
-		"@hapi/hapi": "^20.2.2",
-		"@hapi/jwt": "^3.0.0",
-		"amqplib": "^0.10.3",
-		"core-js": "^3.25.2",
-		"dotenv": "^16.0.2",
-		"hapi-pino": "^11.0.0",
-		"joi": "^17.6.0",
-		"pg": "^8.8.0",
-		"redis": "^4.3.1"
-	},
 	"devDependencies": {
-		"@types/amqplib": "^0.8.2",
-		"@types/core-js": "^2.5.5",
-		"@types/hapi__hapi": "^20.0.12",
-		"@types/hapi__jwt": "^2.0.1",
-		"@types/node": "^18.7.18",
-		"@types/pg": "^8.6.5",
-		"@typescript-eslint/eslint-plugin": ">=5.31.0",
-		"@typescript-eslint/parser": ">=5.31.0",
-		"eslint": ">=8.0.0",
-		"eslint-config-prettier": "^8.5.0",
-		"eslint-config-xo": "^0.42.0",
-		"eslint-config-xo-typescript": "^0.53.0",
 		"husky": "^8.0.1",
 		"lint-staged": "^13.0.3",
-		"node-pg-migrate": "^6.2.2",
-		"pino-pretty": "^9.1.0",
-		"prettier": "^2.7.1",
-		"tsx": "^3.9.0",
-		"typescript": ">=4.4",
-		"vitest": "^0.23.4"
+		"turbo": "^1.6.1"
 	}
 }
